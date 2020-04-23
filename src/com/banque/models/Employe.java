@@ -1,26 +1,39 @@
 package com.banque.models;
 
+import java.util.UUID;
+
 public class Employe {
-	private int id;
+	private String id;
 	private String nom;
 	private String pernom;
 	private String mail;
 	private String motdepasse;
-	
-	public Employe(int id, String nom, String pernom, String mail,String motdepasse) {
+
+	public Employe(String id,String nom, String pernom, String mail,String motdepasse) {
 		super();
-		this.id = id;
+		this.id = id; 
 		this.nom = nom;
 		this.pernom = pernom;
 		this.mail = mail;
 		this.motdepasse = motdepasse;
 	}
+	public Employe(String nom, String pernom, String mail,String motdepasse) {
+		super();
+		this.id = UUID.randomUUID().toString(); 
+		this.nom = nom;
+		this.pernom = pernom;
+		this.mail = mail;
+		this.motdepasse = motdepasse;
+	}
+	public Employe(String id){
+		this.id = id;
+	}
 
-	public int getId() {
+	public String getId() {
 		return id;
 	}
 
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 

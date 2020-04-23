@@ -55,4 +55,11 @@ public class Transaction {
 	public void setResponsable(Employe responsable) {
 		this.responsable = responsable;
 	}
+	public String toString() {
+		return "Transaction [id=" + id + ", type=" + type + ", emetteur="
+				+ emetteur + ", beneficiaire=" + beneficiaire
+				+ ", date_transaction=" + date_transaction + ", responsable="
+				+ responsable + "]";
+	}
+	
 }	

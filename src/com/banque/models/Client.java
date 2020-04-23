@@ -1,16 +1,18 @@
 package com.banque.models;
 
+import java.util.UUID;
+
 public class Client {
-	private int id;
+	private String id;
 	private String nom;
 	private String prenom;
 	private int tel;
 	private String adress;
 	private Employe employe;
 	
-	public Client(int id, String nom, String prenom, int tel, String adress,Employe employe) {
+	public Client(String id,String nom, String prenom, int tel, String adress,Employe employe) {
 		super();
-		this.id = id;
+		this.id = id; 
 		this.nom = nom;
 		this.prenom = prenom;
 		this.tel = tel;
@@ -18,10 +20,20 @@ public class Client {
 		this.employe = employe;
 	}
 	
-	public int getId() {
+	public Client(String nom, String prenom, int tel, String adress,Employe employe) {
+		super();
+		this.id = UUID.randomUUID().toString(); 
+		this.nom = nom;
+		this.prenom = prenom;
+		this.tel = tel;
+		this.adress = adress;
+		this.employe = employe;
+	}
+	
+	public String getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
 	public String getNom() {
