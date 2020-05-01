@@ -185,16 +185,18 @@ public class Transaction_controller {
 	 public ArrayList<Transaction> Get_Ver_transaction(){
 			try {
 				ArrayList<Transaction> mylist = new ArrayList<Transaction>();
-				
 				stmt = con.createStatement();
-				String sql = "SELECT * FROM transaction INNER JOIN employe ON transaction.e_id = employe.e_id WHERE transaction.t_type = 'virment'";
+				String sql = "SELECT * FROM transaction WHERE t_type = 'virment'";
 				rs = stmt.executeQuery(sql);
 				while(rs.next()){
-					while(rs.next()){
-						ep = new Employe(rs.getString("e_id"),rs.getString("e_nom"),rs.getString("e_prenom"),rs.getString("e_mail"));
-						type = rs.getString("t_type");
-						mnt = rs.getInt("montant");
-						id = rs.getInt("t_id");
+					Statement stmt = con.createStatement();
+					String sql5 = "SELECT * FROM transaction JOIN employe ON transaction.e_id = employe.e_id WHERE transaction.t_type = 'virment'";
+					ResultSet rs5 = stmt.executeQuery(sql5);
+					while(rs5.next()){
+						ep = new Employe(rs5.getString("e_id"),rs5.getString("e_nom"),rs5.getString("e_prenom"),rs5.getString("e_mail"));
+						type = rs5.getString("t_type");
+						mnt = rs5.getInt("montant");
+						id = rs5.getInt("t_id");
 					}
 					stmt1 = con.createStatement();
 					String sql1 = "SELECT * FROM transaction JOIN compte ON transaction.c_emetteur = compte.num_compte JOIN client ON compte.titulaire = client.c_id WHERE transaction.t_type = 'virment'";

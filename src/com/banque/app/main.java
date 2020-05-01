@@ -33,17 +33,18 @@ public class main {
 		Compte compte1,compte2;
 		Transaction tr,tr2;
 		
-		
+		/*
 		p = ec.Get_One_Employe("d32cad42-a7ab-4e93-9fb5-9afd58efa5ca");
 		tc.Get_transaction();
 		compte1 = cp.Get_One_Compte("2316510");
 		compte2 = cp.Get_One_Compte("1062349");
-		int mnt = 250;
+	 	int mnt = 250;
 		tr = new Transaction("virment",compte1,compte2,mnt,p);
 		tc.Virment(tr);
-		
+		*/
 		ArrayList<Transaction> arc = new ArrayList<Transaction>();
 		arc = tc.Get_Ver_transaction();
+		
 		
 		Iterator<Transaction> itc = arc.iterator(); 
 		while (itc.hasNext()) { 
