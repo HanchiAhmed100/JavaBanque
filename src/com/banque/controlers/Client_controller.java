@@ -16,10 +16,13 @@ public class Client_controller {
 	String url="jdbc:mysql://localhost/java_banque";
 	String Utilisateur="root";
 	String motDepasse="";
+	
 	Connection con;
+	
 	Statement stmt;
 	ResultSet rs;
 	PreparedStatement pstmt;
+	
 	Employe e;
 	Client c;
 	ArrayList<Client> mylist;
@@ -52,8 +55,10 @@ public class Client_controller {
 			e.printStackTrace();
 			return null;
 		}
-
 	}
+	
+	
+	
 	public Client Get_One_Client(String id){
 		 try {
 			pstmt = con.prepareStatement("SELECT * FROM client LEFT JOIN employe ON client.employe = employe.e_id WHERE client.c_id = ?");
@@ -68,10 +73,12 @@ public class Client_controller {
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;
-		}
-
-	    
+		}   
 	}
+	
+	
+	
+	
 	public void Add_Client(Client c){
 		 try {
 			 pstmt = con.prepareStatement("INSERT INTO client (c_id , c_nom ,c_prenom ,c_tel ,c_adress ,employe) VALUES (?,?,?,?,?,?)");
@@ -102,8 +109,16 @@ public class Client_controller {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
-		
+	}
+	public void Delete_Client(String id){
+		 try {
+			 pstmt = con.prepareStatement("DELETE FROM client where c_id = ? ");
+			 pstmt.setString(1,id);
+			 pstmt.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 		
 		

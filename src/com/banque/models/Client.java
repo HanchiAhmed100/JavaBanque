@@ -19,7 +19,14 @@ public class Client {
 		this.adress = adress;
 		this.employe = employe;
 	}
-	
+	public Client(String id,String nom, String prenom, int tel, String adress) {
+		super();
+		this.id = id; 
+		this.nom = nom;
+		this.prenom = prenom;
+		this.tel = tel;
+		this.adress = adress;
+	}
 	public Client(String nom, String prenom, int tel, String adress,Employe employe) {
 		super();
 		this.id = UUID.randomUUID().toString(); 
@@ -70,7 +77,7 @@ public class Client {
 	public String toString() {
 		return "Client [id=" + id + ", nom=" + nom + ", prenom=" + prenom
 				+ ", tel=" + tel + ", adress=" + adress + ", employe="
-				+ employe + "]";
+				+ employe + "] \n";
 	}
 	
 	

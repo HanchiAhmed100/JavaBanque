@@ -1,36 +1,41 @@
 package com.banque.models;
 import java.util.Date;
+import java.util.UUID;
 
 
 public class Compte {
-	private int id;
-	private int numcompte;
+	private String id;
+	private String numcompte;
 	private Client titulaire;
-	private float solde;
-	private String devise;
-	private Date date_creation;
+	private int solde;
+	private String date_creation;
 	
-	
-
-	public Compte(int id, int numcompte, Client titulaire, float solde,String devise, Date date_creation) {
+	public Compte(String id, String numcompte, Client titulaire, int solde,String date_creation) {
 		super();
 		this.id = id;
 		this.numcompte = numcompte;
 		this.titulaire = titulaire;
 		this.solde = solde;
-		this.devise = devise;
 		this.date_creation = date_creation;
 	}
-	public int getId() {
+	public Compte(String numcompte, Client titulaire, int solde, String date_creation) {
+		super();
+		this.id = UUID.randomUUID().toString(); 
+		this.numcompte = numcompte;
+		this.titulaire = titulaire;
+		this.solde = solde;
+		this.date_creation = date_creation;
+	}
+	public String getId() {
 		return id;
 	}
-	public void setId(int id) {
+	public void setId(String id) {
 		this.id = id;
 	}
-	public int getNumcompte() {
+	public String getNumcompte() {
 		return numcompte;
 	}
-	public void setNumcompte(int numcompte) {
+	public void setNumcompte(String numcompte) {
 		this.numcompte = numcompte;
 	}
 	public Client getTitulaire() {
@@ -39,28 +44,21 @@ public class Compte {
 	public void setTitulaire(Client titulaire) {
 		this.titulaire = titulaire;
 	}
-	public float getSolde() {
+	public int getSolde() {
 		return solde;
 	}
-	public void setSolde(float solde) {
+	public void setSolde(int solde) {
 		this.solde = solde;
 	}
-	public String getDevise() {
-		return devise;
-	}
-	public void setDevise(String devise) {
-		this.devise = devise;
-	}
-	public Date getDate_creation() {
+
+	public String getDate_creation() {
 		return date_creation;
 	}
-	public void setDate_creation(Date date_creation) {
+	public void setDate_creation(String date_creation) {
 		this.date_creation = date_creation;
 	}
 	public String toString() {
-		return "compte [id=" + id + ", numcompte=" + numcompte + ", titulaire="
-				+ titulaire + ", solde=" + solde + ", devise=" + devise
-				+ ", date_creation=" + date_creation + "]";
+		return "compte [id=" + id + ", numcompte=" + numcompte + ", titulaire="+ titulaire + ", solde=" + solde+ ", date_creation=" + date_creation + "]" +" \n ";
 	}
 
 	

@@ -1,5 +1,94 @@
 package com.banque.controlers;
 
-public class Employe_controller {
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.ArrayList;
 
+import com.banque.models.Client;
+import com.banque.models.Compte;
+import com.banque.models.Employe;
+
+public class Employe_controller {
+	String url="jdbc:mysql://localhost/java_banque";
+	String Utilisateur="root";
+	String motDepasse="";
+	Connection con;
+	Statement stmt;
+	ResultSet rs;
+	PreparedStatement pstmt;
+	Employe e;
+	ArrayList<Employe> mylist;
+
+
+	public void Connexion(){
+		try {
+    		Class.forName("com.mysql.jdbc.Driver");
+    		con = DriverManager.getConnection(url , Utilisateur, motDepasse);
+    		System.out.println("connected");
+    	}catch(ClassNotFoundException c) {
+    		System.out.println("Probleme de pilote de base de donnée");
+    	} catch (SQLException e) {
+			e.printStackTrace();
+		}	
+	}
+	public ArrayList<Employe> Get_Emplye(){
+		 try {
+			ArrayList<Employe> mylist = new ArrayList<Employe>();
+			stmt = con.createStatement();
+			String sql = "SELECT * FROM employe";
+			rs = stmt.executeQuery(sql);
+			System.out.println(rs);
+			while(rs.next()){
+				e = new Employe(rs.getString("e_id"),rs.getString("e_nom"),rs.getString("e_prenom"),rs.getString("e_mail"),rs.getString("e_motdepasse"));
+				mylist.add(e);
+			}
+		    return mylist;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	}
+	public Employe Get_One_Compte(String num_compte){
+		 try {
+			pstmt = con.prepareStatement("SELECT * FROM compte LEFT JOIN client ON compte.titulaire = client.c_id WHERE compte.num_compte = ?");
+			pstmt.setString(1,num_compte);
+			rs = pstmt.executeQuery();
+			while(rs.next()){
+				e = new Employe(rs.getString("e_id"),rs.getString("e_nom"),rs.getString("e_prenom"),rs.getString("e_mail"),rs.getString("e_motdepasse"));
+			}
+			return e;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}   
+	}
+	public void Add_Compte(Employe em){
+		 try {
+			 pstmt = con.prepareStatement("INSERT INTO compte (id , e_nom , e_prenom , e_mail , e_motdepasse) VALUES (?,?,?,?,?)");
+			 pstmt.setString(1, em.getId());
+			 pstmt.setString(2, em.getNom());
+			 pstmt.setString(3, em.getPernom());
+			 pstmt.setString(4, em.getMail());
+			 pstmt.setString(5, em.getMotdepasse());
+			 pstmt.executeUpdate();	 
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	public void Delete_Compte(String id){
+		 try {
+			 pstmt = con.prepareStatement("DELETE FROM compte where id = ? ");
+			 pstmt.setString(1,id);
+			 pstmt.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }
