@@ -7,7 +7,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
-import java.util.Iterator;
 
 import com.banque.models.Client;
 import com.banque.models.Employe;
@@ -16,13 +15,10 @@ public class Client_controller {
 	String url="jdbc:mysql://localhost/java_banque";
 	String Utilisateur="root";
 	String motDepasse="";
-	
 	Connection con;
-	
 	Statement stmt;
 	ResultSet rs;
 	PreparedStatement pstmt;
-	
 	Employe e;
 	Client c;
 	ArrayList<Client> mylist;
@@ -31,7 +27,6 @@ public class Client_controller {
 		try {
     		Class.forName("com.mysql.jdbc.Driver");
     		con = DriverManager.getConnection(url , Utilisateur, motDepasse);
-    		System.out.println("connected");
     	}catch(ClassNotFoundException c) {
     		System.out.println("Probleme de pilote de base de donnée");
     	} catch (SQLException e) {
@@ -56,9 +51,6 @@ public class Client_controller {
 			return null;
 		}
 	}
-	
-	
-	
 	public Client Get_One_Client(String id){
 		 try {
 			pstmt = con.prepareStatement("SELECT * FROM client LEFT JOIN employe ON client.employe = employe.e_id WHERE client.c_id = ?");
@@ -75,10 +67,6 @@ public class Client_controller {
 			return null;
 		}   
 	}
-	
-	
-	
-	
 	public void Add_Client(Client c){
 		 try {
 			 pstmt = con.prepareStatement("INSERT INTO client (c_id , c_nom ,c_prenom ,c_tel ,c_adress ,employe) VALUES (?,?,?,?,?,?)");
@@ -94,7 +82,6 @@ public class Client_controller {
 			e.printStackTrace();
 		}
 	}
-
 	public void Update_Client(Client c){
 		 try {
 			 pstmt = con.prepareStatement("UPDATE client SET c_nom = ?,c_prenom = ?,c_tel = ?,c_adress = ?,employe = ? WHERE c_id = ? ");
@@ -120,6 +107,4 @@ public class Client_controller {
 			e.printStackTrace();
 		}
 	}
-		
-		
 }

@@ -10,7 +10,6 @@ import java.util.ArrayList;
 
 import com.banque.models.Client;
 import com.banque.models.Compte;
-import com.banque.models.Employe;
 
 public class Compte_controller {
 	String url="jdbc:mysql://localhost/java_banque";
@@ -28,7 +27,6 @@ public class Compte_controller {
 		try {
     		Class.forName("com.mysql.jdbc.Driver");
     		con = DriverManager.getConnection(url , Utilisateur, motDepasse);
-    		System.out.println("connected");
     	}catch(ClassNotFoundException c) {
     		System.out.println("Probleme de pilote de base de donnée");
     	} catch (SQLException e) {

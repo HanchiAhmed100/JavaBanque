@@ -1,5 +1,4 @@
 package com.banque.models;
-import java.util.Date;
 import java.util.UUID;
 
 
