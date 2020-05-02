@@ -33,6 +33,8 @@ public class main {
 		Compte compte1,compte2;
 		Transaction tr,tr2;
 		
+		Login l = new Login();
+		
 		/*
 		p = ec.Get_One_Employe("d32cad42-a7ab-4e93-9fb5-9afd58efa5ca");
 		tc.Get_transaction();
@@ -41,7 +43,7 @@ public class main {
 	 	int mnt = 250;
 		tr = new Transaction("virment",compte1,compte2,mnt,p);
 		tc.Virment(tr);
-		*/
+		
 		ArrayList<Transaction> arc = new ArrayList<Transaction>();
 		arc = tc.Get_Ver_transaction();
 		

@@ -77,6 +77,24 @@ public class Employe_controller {
 			e.printStackTrace();
 		}
 	}
+	
+	public Employe Login(String mail, String password) {
+		 try {
+			 System.out.println(mail + "  " + password);
+			pstmt = con.prepareStatement("SELECT * FROM employe WHERE e_mail = ? AND e_motdepasse = ? ");
+			pstmt.setString(1,mail);
+			pstmt.setString(2,password);
+			rs = pstmt.executeQuery();	
+			while(rs.next()){
+				e = new Employe(rs.getString("e_id"),rs.getString("e_nom"),rs.getString("e_prenom"),rs.getString("e_mail"),rs.getString("e_motdepasse"));
+			}
+			return e;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}  
+	}
+	
 
 	public void Delete_Compte(String id){
 		 try {
