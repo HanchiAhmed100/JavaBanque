@@ -76,7 +76,8 @@ public class Client_controller {
 			 pstmt.setInt(4, c.getTel());
 			 pstmt.setString(5, c.getAdress());
 			 pstmt.setString(6, c.getEmploye().getId());
-			 pstmt.executeUpdate();	 
+			 pstmt.executeUpdate();	
+			 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

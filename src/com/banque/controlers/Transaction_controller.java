@@ -44,7 +44,7 @@ public class Transaction_controller {
 		}	
 	}
 	
-	public void Virment(Transaction tr){
+	public void virement(Transaction tr){
 		try {
 			pstmt = con.prepareStatement("SELECT * FROM compte WHERE num_compte = ?");
 			pstmt.setString(1, tr.getEmetteur().getNumcompte());
@@ -112,6 +112,7 @@ public class Transaction_controller {
 	}
 	public void Versement(Transaction tr){
 		try{
+			System.out.println(tr);
 			pstmt = con.prepareStatement("SELECT * FROM compte WHERE num_compte = ?");
 			pstmt.setString(1, tr.getBeneficiaire().getNumcompte());
 			rs = pstmt.executeQuery();
@@ -137,7 +138,7 @@ public class Transaction_controller {
 		try {
 			ArrayList<Transaction> mylist = new ArrayList<Transaction>();
 			stmt = con.createStatement();
-			String sql = "SELECT t.t_type , t.montant, t.c_emetteur as em_num , t.c_beneficiaire as bn_num , cl1.c_nom AS em_nom ,cl1.c_prenom AS em_pre ,cl2.c_nom AS bn_nom , cl2.c_prenom AS bn_pre , ep.e_nom,ep.e_prenom FROM transaction as t JOIN employe as ep ON ep.e_id = t.e_id JOIN compte as c1 ON t.c_emetteur = c1.num_compte JOIN client AS cl1 ON C1.titulaire = cl1.c_id JOIN compte as c2 ON t.c_beneficiaire = c2.num_compte JOIN client AS cl2 ON c2.titulaire = cl2.c_id WHERE t.t_type = 'virment'";
+			String sql = "SELECT t.t_type , t.montant, t.c_emetteur as em_num , t.c_beneficiaire as bn_num , cl1.c_nom AS em_nom ,cl1.c_prenom AS em_pre ,cl2.c_nom AS bn_nom , cl2.c_prenom AS bn_pre , ep.e_nom,ep.e_prenom FROM transaction as t JOIN employe as ep ON ep.e_id = t.e_id JOIN compte as c1 ON t.c_emetteur = c1.num_compte JOIN client AS cl1 ON C1.titulaire = cl1.c_id JOIN compte as c2 ON t.c_beneficiaire = c2.num_compte JOIN client AS cl2 ON c2.titulaire = cl2.c_id WHERE t.t_type = 'virement'";
 			rs = stmt.executeQuery(sql);
 			System.out.println(rs);
 			while(rs.next()){
@@ -152,7 +153,7 @@ public class Transaction_controller {
 				ArrayList<Transaction> mylist = new ArrayList<Transaction>();
 				
 				stmt = con.createStatement();
-				String sql = "SELECT * FROM transaction INNER JOIN employe ON transaction.e_id = employe.e_id WHERE transaction.t_type = 'virment'";
+				String sql = "SELECT * FROM transaction INNER JOIN employe ON transaction.e_id = employe.e_id WHERE transaction.t_type = 'virement'";
 				rs = stmt.executeQuery(sql);
 				while(rs.next()){
 					ep = new Employe(rs.getString("e_id"),rs.getString("e_nom"),rs.getString("e_prenom"),rs.getString("e_mail"));
@@ -161,21 +162,21 @@ public class Transaction_controller {
 					id = rs.getInt("t_id");
 				}
 				stmt1 = con.createStatement();
-				String sql1 = "SELECT * FROM transaction JOIN compte ON transaction.c_emetteur = compte.num_compte JOIN client ON compte.titulaire = client.c_id WHERE transaction.t_type = 'virment'";
+				String sql1 = "SELECT * FROM transaction JOIN compte ON transaction.c_emetteur = compte.num_compte JOIN client ON compte.titulaire = client.c_id WHERE transaction.t_type = 'virement'";
 				rs1 = stmt1.executeQuery(sql1);
 				while(rs1.next()){
 					clE = new Client(rs1.getString("c_id"),rs1.getString("c_nom"),rs1.getString("c_prenom"),rs1.getInt("c_tel"),rs1.getString("c_adress"));
 					cpE = new Compte(rs1.getString("id"),rs1.getString("num_compte"),clE,rs1.getInt("solde"),rs1.getString("created_at"));
 				}
 				stmt2 = con.createStatement();
-				String sql2 = "SELECT * FROM transaction JOIN compte ON transaction.c_beneficiaire = compte.num_compte JOIN client ON compte.titulaire = client.c_id WHERE transaction.t_type = 'virment'";
+				String sql2 = "SELECT * FROM transaction JOIN compte ON transaction.c_beneficiaire = compte.num_compte JOIN client ON compte.titulaire = client.c_id WHERE transaction.t_type = 'virement'";
 				rs2 = stmt2.executeQuery(sql2);
 				while(rs2.next()){
 					clR = new Client(rs2.getString("c_id"),rs2.getString("c_nom"),rs2.getString("c_prenom"),rs2.getInt("c_tel"),rs2.getString("c_adress"));
 					cpR = new Compte(rs2.getString("id"),rs2.getString("num_compte"),clR,rs2.getInt("solde"),rs2.getString("created_at"));
 				}
 				
-				tr = new Transaction("virment", cpE, cpR , mnt, ep);
+				tr = new Transaction("virement", cpE, cpR , mnt, ep);
 				return tr;
 			} catch (SQLException e) {
 				e.printStackTrace();
@@ -186,11 +187,11 @@ public class Transaction_controller {
 			try {
 				ArrayList<Transaction> mylist = new ArrayList<Transaction>();
 				stmt = con.createStatement();
-				String sql = "SELECT * FROM transaction WHERE t_type = 'virment'";
+				String sql = "SELECT * FROM transaction WHERE t_type = 'virement'";
 				rs = stmt.executeQuery(sql);
 				while(rs.next()){
 					Statement stmt = con.createStatement();
-					String sql5 = "SELECT * FROM transaction JOIN employe ON transaction.e_id = employe.e_id WHERE transaction.t_type = 'virment'";
+					String sql5 = "SELECT * FROM transaction JOIN employe ON transaction.e_id = employe.e_id WHERE transaction.t_type = 'virement'";
 					ResultSet rs5 = stmt.executeQuery(sql5);
 					while(rs5.next()){
 						ep = new Employe(rs5.getString("e_id"),rs5.getString("e_nom"),rs5.getString("e_prenom"),rs5.getString("e_mail"));
@@ -199,21 +200,21 @@ public class Transaction_controller {
 						id = rs5.getInt("t_id");
 					}
 					stmt1 = con.createStatement();
-					String sql1 = "SELECT * FROM transaction JOIN compte ON transaction.c_emetteur = compte.num_compte JOIN client ON compte.titulaire = client.c_id WHERE transaction.t_type = 'virment'";
+					String sql1 = "SELECT * FROM transaction JOIN compte ON transaction.c_emetteur = compte.num_compte JOIN client ON compte.titulaire = client.c_id WHERE transaction.t_type = 'virement'";
 					rs1 = stmt1.executeQuery(sql1);
 					while(rs1.next()){
 						clE = new Client(rs1.getString("c_id"),rs1.getString("c_nom"),rs1.getString("c_prenom"),rs1.getInt("c_tel"),rs1.getString("c_adress"));
 						cpE = new Compte(rs1.getString("id"),rs1.getString("num_compte"),clE,rs1.getInt("solde"),rs1.getString("created_at"));
 					}
 					stmt2 = con.createStatement();
-					String sql2 = "SELECT * FROM transaction JOIN compte ON transaction.c_beneficiaire = compte.num_compte JOIN client ON compte.titulaire = client.c_id WHERE transaction.t_type = 'virment'";
+					String sql2 = "SELECT * FROM transaction JOIN compte ON transaction.c_beneficiaire = compte.num_compte JOIN client ON compte.titulaire = client.c_id WHERE transaction.t_type = 'virement'";
 					rs2 = stmt2.executeQuery(sql2);
 					while(rs2.next()){
 						clR = new Client(rs2.getString("c_id"),rs2.getString("c_nom"),rs2.getString("c_prenom"),rs2.getInt("c_tel"),rs2.getString("c_adress"));
 						cpR = new Compte(rs2.getString("id"),rs2.getString("num_compte"),clR,rs2.getInt("solde"),rs2.getString("created_at"));
 					}
 					
-					tr = new Transaction("virment", cpE, cpR , mnt, ep);
+					tr = new Transaction("virement", cpE, cpR , mnt, ep);
 					mylist.add(tr);
 				}
 				return mylist;

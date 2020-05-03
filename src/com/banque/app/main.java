@@ -35,14 +35,14 @@ public class main {
 		
 		Login l = new Login();
 		
-		/*
+/*		
 		p = ec.Get_One_Employe("d32cad42-a7ab-4e93-9fb5-9afd58efa5ca");
 		tc.Get_transaction();
 		compte1 = cp.Get_One_Compte("2316510");
 		compte2 = cp.Get_One_Compte("1062349");
 	 	int mnt = 250;
-		tr = new Transaction("virment",compte1,compte2,mnt,p);
-		tc.Virment(tr);
+		tr = new Transaction("virement",compte1,compte2,mnt,p);
+		tc.virement(tr);
 		
 		ArrayList<Transaction> arc = new ArrayList<Transaction>();
 		arc = tc.Get_Ver_transaction();
@@ -57,14 +57,14 @@ public class main {
 		//ec.Add_Employe(p);
 		
 		
-		// SELECT t.t_type ,t,montant t.c_emetteur as em_num , t.c_beneficiaire as bn_num , cl1.c_nom AS em_nom ,cl1.c_prenom AS em_pre ,cl2.c_nom AS bn_nom , cl2.c_prenom AS bn_pre FROM transaction as t JOIN compte as c1 ON t.c_emetteur = c1.num_compte JOIN client AS cl1 ON C1.titulaire = cl1.c_id JOIN compte as c2 ON t.c_beneficiaire = c2.num_compte JOIN client AS cl2 ON c2.titulaire = cl2.c_id WHERE t.t_type = "virment"		
-			/*
+		// SELECT t.t_type ,t,montant t.c_emetteur as em_num , t.c_beneficiaire as bn_num , cl1.c_nom AS em_nom ,cl1.c_prenom AS em_pre ,cl2.c_nom AS bn_nom , cl2.c_prenom AS bn_pre FROM transaction as t JOIN compte as c1 ON t.c_emetteur = c1.num_compte JOIN client AS cl1 ON C1.titulaire = cl1.c_id JOIN compte as c2 ON t.c_beneficiaire = c2.num_compte JOIN client AS cl2 ON c2.titulaire = cl2.c_id WHERE t.t_type = "virement"		
+			
 
 		System.out.println("------------------ AVANT  --------------------");
 		System.out.println(compte1.toString());
 		System.out.println("----------------------------------------------");
 
-		int mnt = 25;
+		int mnt1 = 25;
 		
 		tc.Retrait(tr);
 		System.out.println("------------------ APRES Retrait -------------");
@@ -85,8 +85,8 @@ public class main {
 		
 		
 
-		tr = new Transaction("virment",compte2,compte1,mnt,p);
-		tc.Virment(tr);
+		tr = new Transaction("virement",compte2,compte1,mnt1,p);
+		tc.virement(tr);
 		
 		System.out.println("------------------ APRES VIRMETNT -------------");
 		
