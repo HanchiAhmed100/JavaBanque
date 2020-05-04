@@ -10,6 +10,7 @@ import java.util.ArrayList;
 
 import com.banque.models.Client;
 import com.banque.models.Compte;
+import com.banque.models.Employe;
 
 public class Compte_controller {
 	String url="jdbc:mysql://localhost/java_banque";
@@ -37,7 +38,7 @@ public class Compte_controller {
 		 try {
 			ArrayList<Compte> mylist = new ArrayList<Compte>();
 			stmt = con.createStatement();
-			String sql = "SELECT * FROM compte LEFT JOIN client ON compte.titulaire = client.c_id";
+			String sql = "SELECT * FROM compte LEFT JOIN client ON compte.titulaire = client.c_id ORDER BY client.c_nom";
 			rs = stmt.executeQuery(sql);
 			System.out.println(rs);
 			while(rs.next()){
@@ -68,17 +69,31 @@ public class Compte_controller {
 	}
 	public void Add_Compte(Compte cp){
 		 try {
-			 pstmt = con.prepareStatement("INSERT INTO compte (id , num_compte ,titulaire ,solde,created_at) VALUES (?,?,?,?,?)");
+			 pstmt = con.prepareStatement("INSERT INTO compte (id , num_compte ,titulaire ,solde) VALUES (?,?,?,?)");
 			 pstmt.setString(1, cp.getId());
 			 pstmt.setString(2, cp.getNumcompte());
 			 pstmt.setString(3, cp.getTitulaire().getId());
 			 pstmt.setFloat(4, cp.getSolde());
-			 pstmt.setString(5,cp.getDate_creation());
 			 pstmt.executeUpdate();	 
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	public int new_Compte_num() {
+		 try {
+			stmt = con.createStatement();
+			String sql = "SELECT * FROM compte ORDER BY num_compte DESC LIMIT 1";
+			rs = stmt.executeQuery(sql);
+			int num = 0;
+			while(rs.next()){
+				num = Integer.parseInt((rs.getString("num_compte")));
+				num = num + 1;
+			}
+			return num;
+		 }catch (SQLException e) {
+			e.printStackTrace();
+			return 0;
+		}    
 	}
 
 	public void Delete_Compte(String id){

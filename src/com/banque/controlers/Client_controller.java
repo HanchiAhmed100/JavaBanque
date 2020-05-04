@@ -37,7 +37,7 @@ public class Client_controller {
 		 try {
 			ArrayList<Client> mylist = new ArrayList<Client>();
 			stmt = con.createStatement();
-			String sql = "SELECT * FROM client LEFT JOIN employe ON client.employe = employe.e_id";
+			String sql = "SELECT * FROM client LEFT JOIN employe ON client.employe = employe.e_id ORDER BY client.c_nom";
 			rs = stmt.executeQuery(sql);
 			System.out.println(rs);
 			while(rs.next()){

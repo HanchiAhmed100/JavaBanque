@@ -32,28 +32,30 @@ import javax.swing.DefaultListModel;
 import javax.swing.ImageIcon;
 import java.awt.event.ActionListener;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.Vector;
 import java.awt.event.ActionEvent;
 import javax.swing.JRadioButton;
-import javax.swing.JList;
 import javax.swing.JTable;
-import java.awt.FlowLayout;
-import javax.swing.BoxLayout;
-import java.awt.BorderLayout;
 import javax.swing.JScrollPane;
+import javax.swing.JList;
+import javax.swing.JComboBox;
 
 public class bb {
-	private Compte cEmetteur,cBenef;
+	private Compte cEmetteur,cBenef,compte;
 	private Compte_controller cc;
 	private Employe_controller ec;
 	private Employe employe;
 	private Transaction_controller tc;
 	private Transaction transaction; 
 	private Client_controller CCli;
-	private Client client;
-	ArrayList<Client> arc ;
-
+	private Client client, Newclient;
+	private ArrayList<Client> arc ;
+	private ArrayList<Client> titulairesArray ;
+	private ArrayList<Compte> list;
+	
+	private int numCompte;
+	private String type;
 	
 	
 	private JFrame frame;
@@ -65,19 +67,27 @@ public class bb {
 	private ButtonGroup G1;
 	private JRadioButton versement,virement,retrait; 
 	private JLabel Client_description,benef_text,message;
-	private JPanel panel_emetteur,panel_benef,panel_solde,panel_compte,panel_Client;
+	private JPanel panel_emetteur,panel_benef,panel_solde,panel_compte,panel_Client,panel_1 ;
 	private JTextField benef;
 	private JTextField solde;
-	private String type;
-	private JTable table;
-	private JTable table_1;
-	private JTable table_2;
+
+
 	private JTable table_3;
 	private JTextField NameTextfield;
 	private JTextField lastnametextfield;
 	private JTextField phonetextfield;
 	private JTextField adressetextfield;
-	private JScrollPane scrollPane;
+	private JScrollPane scrollPane,scrollPane_compte;
+	private JTable jTable,mytable;
+	private JPanel panel_5;
+	private JComboBox titulaire ;
+	private DefaultListModel<String> modelComboBox;
+	private DefaultTableModel contactTableModel;
+	private JLabel lblNewLabel_8;
+	private JTextField numcompteTextField;
+	private JLabel lblNewLabel_9;
+	private JTextField newCompteSolde;
+
 	/**
 	 * Launch the application.
 	 */
@@ -111,7 +121,7 @@ public class bb {
 		frame.getContentPane().setLayout(null);
 		
 		layeredPane = new JLayeredPane();
-		layeredPane.setBounds(-19, 0, 672, 555);
+		layeredPane.setBounds(-19, 49, 672, 506);
 		frame.getContentPane().add(layeredPane);
 		layeredPane.setLayout(new CardLayout(0, 0));
 		
@@ -124,6 +134,15 @@ public class bb {
 		panel_3.setBackground(new Color(34, 45, 65));
 		panel.add(panel_3, "name_177190634784400");
 		
+		
+        
+        panel_1 = new JPanel();
+        panel_1.setLayout(null);
+        panel_1.setBounds(0, 0, 642, 45);
+        frame.getContentPane().add(panel_1);
+		panel_1.setVisible(false);
+		
+		
 		JButton button = new JButton("VALIDER");
 		button.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent arg0) {
@@ -134,6 +153,7 @@ public class bb {
 				employe = ec.Login(login, mdp);
 				if(employe != null ) {
 					JOptionPane.showMessageDialog(null, " Bienvenue "+employe.getNom() +" "+employe.getMotdepasse() +" :D <3  " );	
+					panel_1.setVisible(true);
 					layeredPane.removeAll();
 					layeredPane.add(panel_transaction);
 					layeredPane.repaint();
@@ -198,7 +218,7 @@ public class bb {
 		
 		JLabel label_4 = new JLabel("");
 		label_4.setIcon(new ImageIcon("C:\\Users\\ahmed\\Desktop\\images\\kisspng-financial-services-finance-business-computer-icons-services-5ac0b676a4fb93.0520531715225790626758.png"));
-		label_4.setBounds(-60, 11, 477, 529);
+		label_4.setBounds(-63, -15, 477, 529);
 		panel_4.add(label_4);
 		
 		panel_transaction = new JPanel();
@@ -334,7 +354,9 @@ public class bb {
 				panel_solde.setLayout(null);
 				panel_solde.setBounds(44, 299, 574, 103);
 				panel_transaction.add(panel_solde);
-				
+				/*
+				 *	AJOUTER   TRANSACTION ----------------------------------------------------------
+				 */
 				JButton btnValiderTransaction = new JButton("Valider Transaction");
 				btnValiderTransaction.addActionListener(new ActionListener() {
 					public void actionPerformed(ActionEvent e) {
@@ -345,18 +367,60 @@ public class bb {
 							if( type == "virement") {
 								transaction = new Transaction(type, cEmetteur, cBenef,mnt,employe);
 								tc.virement(transaction);
+								int CompteEmetteurIndex = 0 , CompteBenfIndex = 0;
+								int EmetteurSolde = 0 , BenefSold = 0;
+								for(int i = 0; i < list.size();i++) {
+									if( cEmetteur.getNumcompte().equals(list.get(i).getNumcompte()) ) {
+										CompteEmetteurIndex = i;
+										EmetteurSolde = cEmetteur.getSolde() - mnt ;
+									}
+									if( cBenef.getNumcompte().equals(list.get(i).getNumcompte()) ) {
+										CompteBenfIndex = i;
+										BenefSold = cBenef.getSolde() + mnt ;
+									}
+								}
+								DefaultTableModel ChangeSoldeEmetteurAndBenf = (DefaultTableModel) jTable.getModel();
+							    jTable.setModel(ChangeSoldeEmetteurAndBenf);
+							    ChangeSoldeEmetteurAndBenf.setValueAt(EmetteurSolde+"",CompteEmetteurIndex , 3);
+							    ChangeSoldeEmetteurAndBenf.setValueAt(BenefSold+"",CompteBenfIndex , 3);
+
 							}else if(type == "versement"){
 								transaction = new Transaction(type,cBenef,mnt,employe);
 								tc.Versement(transaction);
+								int CompteBenfIndex = 0;
+								int BenefSold = 0;
+								for(int i = 0; i < list.size();i++) {
+									if( cBenef.getNumcompte().equals(list.get(i).getNumcompte()) ) {
+										CompteBenfIndex = i;
+										BenefSold = cBenef.getSolde() + mnt ;
+									}
+								}
+								DefaultTableModel ChangeSoldeEmetteurAndBenf = (DefaultTableModel) jTable.getModel();
+							    jTable.setModel(ChangeSoldeEmetteurAndBenf);
+							    ChangeSoldeEmetteurAndBenf.setValueAt(BenefSold+"",CompteBenfIndex , 3);
+								
 							}else {
 								transaction = new Transaction(type,cBenef,mnt,employe);
 								tc.Retrait(transaction);
+								int CompteBenfIndex = 0;
+								int BenefSold = 0;
+								for(int i = 0; i < list.size();i++) {
+									if( cBenef.getNumcompte().equals(list.get(i).getNumcompte()) ) {
+										CompteBenfIndex = i;
+										BenefSold = cBenef.getSolde() - mnt ;
+									}
+								}
+								DefaultTableModel ChangeSoldeEmetteurAndBenf = (DefaultTableModel) jTable.getModel();
+							    jTable.setModel(ChangeSoldeEmetteurAndBenf);
+							    ChangeSoldeEmetteurAndBenf.setValueAt(BenefSold+"",CompteBenfIndex , 3);
 							}
-							JOptionPane.showMessageDialog(null, " Transaction effectuer " );	
+							JOptionPane.showMessageDialog(null, " Transaction effectuer " );
 							resetForm();
 						}
 					}
 				});
+				
+		
 				btnValiderTransaction.setFocusable(false);
 				btnValiderTransaction.setBounds(22, 47, 161, 23);
 				panel_solde.add(btnValiderTransaction);
@@ -386,91 +450,98 @@ public class bb {
 				message = new JLabel("");
 				message.setBounds(63, 408, 317, 14);
 				panel_transaction.add(message);
-				
-				JPanel panel_1 = new JPanel();
-				panel_1.setBounds(20, 11, 642, 45);
-				panel_transaction.add(panel_1);
-				panel_1.setLayout(null);
-				JButton button_1 = new JButton("Clients");
-				button_1.setBounds(419, 0, 223, 45);
-				panel_1.add(button_1);
-				button_1.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						layeredPane.removeAll();
-						layeredPane.add(panel_Client);
-						layeredPane.repaint();
-						layeredPane.revalidate();
-					}
-				});
-				button_1.setFocusPainted(false);
-				button_1.setFocusTraversalKeysEnabled(false);
-				button_1.setFocusable(false);
-				button_1.setFont(new Font("PMingLiU-ExtB", Font.PLAIN, 18));
-				button_1.setForeground(new Color(255, 255, 255));
-				button_1.setBorder(new MatteBorder(0, 0, 2, 0, (Color) new Color(255, 255, 255)));
-				button_1.setBackground(new Color(34, 45, 65));
-				
-				JButton btnNewButton = new JButton("Compte");
-				btnNewButton.setBounds(0, 0, 212, 45);
-				panel_1.add(btnNewButton);
-				btnNewButton.addActionListener(new ActionListener() {
-					public void actionPerformed(ActionEvent e) {
-						layeredPane.removeAll();
-						layeredPane.add(panel_compte);
-						layeredPane.repaint();
-						layeredPane.revalidate();
-					}
-				});
-				btnNewButton.setFocusable(false);
-				btnNewButton.setFocusPainted(false);
-				btnNewButton.setFocusTraversalKeysEnabled(false);
-				btnNewButton.setFont(new Font("PMingLiU-ExtB", Font.PLAIN, 18));
-				btnNewButton.setForeground(new Color(255, 255, 255));
-				btnNewButton.setBorder(new MatteBorder(0, 0, 2, 0, (Color) new Color(255, 255, 255)));
-				btnNewButton.setBackground(new Color(34, 45, 65));
-				
-				JButton btnNewButton_1 = new JButton("Transaction");
-				btnNewButton_1.setBounds(211, 0, 212, 45);
-				panel_1.add(btnNewButton_1);
-				btnNewButton_1.setFocusTraversalKeysEnabled(false);
-				btnNewButton_1.setFocusPainted(false);
-				btnNewButton_1.setFont(new Font("PMingLiU-ExtB", Font.PLAIN, 18));
-				btnNewButton_1.setForeground(new Color(255, 255, 255));
-				btnNewButton_1.setBorder(new MatteBorder(0, 0, 2, 0, (Color) new Color(255, 255, 255)));
-				btnNewButton_1.setBackground(new Color(34, 45, 65));
-		
-
-		
+			    
 		panel_compte = new JPanel();
 		layeredPane.add(panel_compte, "name_176997634846200");
 		panel_compte.setLayout(null);
+	
+		loadComptesTable();
+		scrollPane_compte = new JScrollPane(jTable);
+		scrollPane_compte.setBounds(35, 191, 608, 291);
+        panel_compte.add(scrollPane_compte);
+        
+        panel_5 = new JPanel();
+        panel_5.setBounds(51, 11, 571, 141);
+        panel_compte.add(panel_5);
+        panel_5.setLayout(null);
+        
+        JLabel lblNewLabel_7 = new JLabel("Nom et prenom du client :");
+        lblNewLabel_7.setBounds(10, 11, 163, 14);
+        panel_5.add(lblNewLabel_7);
+        
+        titulaire = new JComboBox();
+        loadTitulairComboBox();
+        titulaire.addActionListener (new ActionListener () {
+            public void actionPerformed(ActionEvent e) {
+            	int index = titulaire.getSelectedIndex(); 
+            	Newclient = titulairesArray.get(index);
+            	cc = new Compte_controller();
+            	cc.Connexion();
+            	numCompte = cc.new_Compte_num();
+            	numcompteTextField.setText(numCompte+"");
+            }
+        });
 		
-		JList list = new JList();
-		list.setBounds(336, 159, -186, -154);
-		panel_compte.add(list);
-		
-		table = new JTable();
-		table.setBounds(174, 110, 118, 50);
-		panel_compte.add(table);
+
+        titulaire.setBounds(183, 8, 363, 20);
+        panel_5.add(titulaire);
+        
+        JPanel panel_6 = new JPanel();
+        panel_6.setBounds(0, 36, 561, 105);
+        panel_5.add(panel_6);
+        panel_6.setLayout(null);
+        
+        lblNewLabel_8 = new JLabel("Numero de nouveau compte :");
+        lblNewLabel_8.setBounds(10, 11, 142, 14);
+        panel_6.add(lblNewLabel_8);
+        
+        numcompteTextField = new JTextField();
+        numcompteTextField.setEnabled(false);
+        numcompteTextField.setBounds(183, 8, 363, 20);
+        panel_6.add(numcompteTextField);
+        numcompteTextField.setColumns(10);
+        
+        lblNewLabel_9 = new JLabel("Solde :");
+        lblNewLabel_9.setBounds(10, 39, 46, 14);
+        panel_6.add(lblNewLabel_9);
+        
+        newCompteSolde = new JTextField();
+        newCompteSolde.setBounds(183, 36, 363, 20);
+        panel_6.add(newCompteSolde);
+        newCompteSolde.setColumns(10);
+        
+        JButton btnNewButton = new JButton("Valider");
+        btnNewButton.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(newCompteSolde.getText() != "" || Newclient != null ) {
+                	cc = new Compte_controller();
+                	cc.Connexion();
+                	compte = new Compte(numCompte+"",Newclient,Integer.parseInt(newCompteSolde.getText())); 
+                	cc.Add_Compte(compte);
+                	
+					JOptionPane.showMessageDialog(null, " Le Compte à été ajouter " );
+
+				    DefaultTableModel tableModelCompte = (DefaultTableModel) jTable.getModel();
+				    jTable.setModel(tableModelCompte);
+				    tableModelCompte.addRow(new Object[]{compte.getTitulaire().getNom() +" "+compte.getTitulaire().getPrenom() ,compte.getTitulaire().getTel()+"" ,compte.getNumcompte(), compte.getSolde()+"DT", "aujourd'hui"});
+					
+        		}
+        	}
+        });
+        btnNewButton.setBounds(10, 71, 131, 23);
+        panel_6.add(btnNewButton);
 		
 		panel_Client = new JPanel();
-		layeredPane.add(panel_Client, "name_195965575302300");
-		
-
-
-
-		
-        
+		layeredPane.add(panel_Client, "name_195965575302300");        
 
 		loadClientTable();
         scrollPane = new JScrollPane(table_3);        
-        scrollPane.setBounds(51, 207, 571, 326);
+        scrollPane.setBounds(51, 191, 571, 291);
         panel_Client.add(scrollPane);
         
         
-        
         JPanel panel_2 = new JPanel();
-        panel_2.setBounds(51, 56, 571, 153);
+        panel_2.setBounds(51, 27, 571, 153);
         panel_Client.add(panel_2);
         panel_2.setLayout(null);
         
@@ -479,31 +550,31 @@ public class bb {
         panel_2.add(lblNewLabel_3);
         
         JLabel lblNewLabel_2 = new JLabel("Ajouter Client");
-        lblNewLabel_2.setBounds(164, 1, 133, 24);
+        lblNewLabel_2.setBounds(209, 1, 133, 24);
         lblNewLabel_2.setFont(new Font("Microsoft New Tai Lue", Font.PLAIN, 18));
         panel_2.add(lblNewLabel_2);
         
         NameTextfield = new JTextField();
-        NameTextfield.setBounds(91, 36, 140, 20);
+        NameTextfield.setBounds(91, 36, 171, 20);
         panel_2.add(NameTextfield);
         NameTextfield.setColumns(10);
         
-        JLabel lblNewLabel_4 = new JLabel("Prenom");
-        lblNewLabel_4.setBounds(251, 39, 46, 14);
+        JLabel lblNewLabel_4 = new JLabel("Prenom :");
+        lblNewLabel_4.setBounds(296, 39, 51, 14);
         panel_2.add(lblNewLabel_4);
         
         lastnametextfield = new JTextField();
-        lastnametextfield.setBounds(321, 36, 158, 20);
+        lastnametextfield.setBounds(357, 36, 171, 20);
         panel_2.add(lastnametextfield);
         lastnametextfield.setColumns(10);
         
         phonetextfield = new JTextField();
-        phonetextfield.setBounds(91, 72, 140, 20);
+        phonetextfield.setBounds(91, 72, 171, 20);
         panel_2.add(phonetextfield);
         phonetextfield.setColumns(10);
         
         adressetextfield = new JTextField();
-        adressetextfield.setBounds(321, 72, 158, 20);
+        adressetextfield.setBounds(357, 72, 171, 20);
         panel_2.add(adressetextfield);
         adressetextfield.setColumns(10);
         
@@ -512,7 +583,7 @@ public class bb {
         panel_2.add(lblNewLabel_5);
         
         JLabel lblNewLabel_6 = new JLabel("Adresse :");
-        lblNewLabel_6.setBounds(249, 75, 72, 14);
+        lblNewLabel_6.setBounds(296, 75, 72, 14);
         panel_2.add(lblNewLabel_6);
         
         JButton btnNewButton_2 = new JButton("Ajouter");
@@ -530,7 +601,16 @@ public class bb {
 					CCli.Connexion();
 					CCli.Add_Client(client);
 					JOptionPane.showMessageDialog(null, " Client à été ajouter " );
-					reloadClientPage("");
+
+				    DefaultTableModel tableModel = (DefaultTableModel) table_3.getModel();
+				    table_3.setModel(tableModel);
+				    tableModel.addRow(new Object[]{client.getNom() +" "+client.getPrenom() ,client.getTel()+"" ,client.getAdress(), employe.getNom()+" "+employe.getPernom()});
+					titulaire.addItem(client.getPrenom()+" "+client.getNom()+" ");
+					titulairesArray.add(client);
+	           		NameTextfield.setText("");
+	        		lastnametextfield.setText("");
+	        		phonetextfield.setText("");
+	        		adressetextfield.setText("");
         		}
         	}
         });
@@ -547,49 +627,118 @@ public class bb {
         });
         btnNewButton_3.setBounds(197, 103, 110, 23);
         panel_2.add(btnNewButton_3);
+
         
-        JPanel panel_5 = new JPanel();
-        panel_5.setLayout(null);
-        layeredPane.add(panel_5, "name_207137801625900");
+        JButton button_1 = new JButton("Clients");
+        button_1.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+				layeredPane.removeAll();
+				layeredPane.add(panel_Client);
+				layeredPane.repaint();
+				layeredPane.revalidate();
+        	}
+        });
+        button_1.setForeground(Color.WHITE);
+        button_1.setFont(new Font("PMingLiU-ExtB", Font.PLAIN, 18));
+        button_1.setFocusable(false);
+        button_1.setFocusTraversalKeysEnabled(false);
+        button_1.setFocusPainted(false);
+        button_1.setBorder(new MatteBorder(0, 0, 2, 0, (Color) new Color(255, 255, 255)));
+        button_1.setBackground(new Color(34, 45, 65));
+        button_1.setBounds(419, 0, 223, 45);
+        panel_1.add(button_1);
         
-        JButton button_5 = new JButton("Clients");
-        button_5.setForeground(Color.WHITE);
-        button_5.setFont(new Font("PMingLiU-ExtB", Font.PLAIN, 18));
-        button_5.setFocusable(false);
-        button_5.setFocusTraversalKeysEnabled(false);
-        button_5.setFocusPainted(false);
-        button_5.setBorder(new MatteBorder(0, 0, 2, 0, (Color) new Color(255, 255, 255)));
-        button_5.setBackground(new Color(34, 45, 65));
-        button_5.setBounds(419, 0, 223, 45);
-        panel_5.add(button_5);
+        JButton button_8 = new JButton("Compte");
+        button_8.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+				layeredPane.removeAll();
+				layeredPane.add(panel_compte);
+				layeredPane.repaint();
+				layeredPane.revalidate();
+        	}
+        });
+        button_8.setForeground(Color.WHITE);
+        button_8.setFont(new Font("PMingLiU-ExtB", Font.PLAIN, 18));
+        button_8.setFocusable(false);
+        button_8.setFocusTraversalKeysEnabled(false);
+        button_8.setFocusPainted(false);
+        button_8.setBorder(new MatteBorder(0, 0, 2, 0, (Color) new Color(255, 255, 255)));
+        button_8.setBackground(new Color(34, 45, 65));
+        button_8.setBounds(0, 0, 212, 45);
+        panel_1.add(button_8);
         
-        JButton button_6 = new JButton("Compte");
-        button_6.setForeground(Color.WHITE);
-        button_6.setFont(new Font("PMingLiU-ExtB", Font.PLAIN, 18));
-        button_6.setFocusable(false);
-        button_6.setFocusTraversalKeysEnabled(false);
-        button_6.setFocusPainted(false);
-        button_6.setBorder(new MatteBorder(0, 0, 2, 0, (Color) new Color(255, 255, 255)));
-        button_6.setBackground(new Color(34, 45, 65));
-        button_6.setBounds(0, 0, 212, 45);
-        panel_5.add(button_6);
-        
-        JButton button_7 = new JButton("Transaction");
-        button_7.setForeground(Color.WHITE);
-        button_7.setFont(new Font("PMingLiU-ExtB", Font.PLAIN, 18));
-        button_7.setFocusTraversalKeysEnabled(false);
-        button_7.setFocusPainted(false);
-        button_7.setBorder(new MatteBorder(0, 0, 2, 0, (Color) new Color(255, 255, 255)));
-        button_7.setBackground(new Color(34, 45, 65));
-        button_7.setBounds(211, 0, 212, 45);
-        panel_5.add(button_7);
+        JButton button_9 = new JButton("Transaction");
+        button_9.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+				layeredPane.removeAll();
+				layeredPane.add(panel_transaction);
+				layeredPane.repaint();
+				layeredPane.revalidate();
+        	}
+        });
+        button_9.setForeground(Color.WHITE);
+        button_9.setFont(new Font("PMingLiU-ExtB", Font.PLAIN, 18));
+        button_9.setFocusTraversalKeysEnabled(false);
+        button_9.setFocusPainted(false);
+        button_9.setBorder(new MatteBorder(0, 0, 2, 0, (Color) new Color(255, 255, 255)));
+        button_9.setBackground(new Color(34, 45, 65));
+        button_9.setBounds(211, 0, 212, 45);
+        panel_1.add(button_9);
 		
 
-	}
-	public void reloadClientPage(String panne) {
-		
+
 	}
 
+
+	public void loadTitulairComboBox() {
+		CCli = new Client_controller();
+		CCli.Connexion();
+		titulairesArray = new ArrayList<Client>();
+		titulairesArray = CCli.Get_Client();    
+		for (int i = 0; i < titulairesArray.size(); i++){
+			titulaire.addItem(titulairesArray.get(i).getPrenom()+" "+titulairesArray.get(i).getNom()+" ");
+		}
+
+	}
+	
+	
+	public void loadComptesTable() {
+    	cc = new Compte_controller();
+    	cc.Connexion();
+	    list = new ArrayList<Compte>();
+        list = cc.Get_Comptes();
+        
+        Vector<String> header = new Vector<String>();
+        
+        header.add("NOM ET PRENOM"); 
+        header.add("TELEPHONE");
+        header.add("COMPTE");
+        header.add("SOLDE");
+        header.add("DATE DE CREATION" );
+
+        Vector<Vector<Object>> data = new  Vector<Vector<Object>>();
+		for (int i = 0; i < list.size(); i++){
+
+           Vector<Object> row = new Vector<Object>();
+ 		   String fullname = list.get(i).getTitulaire().getNom()+" "+list.get(i).getTitulaire().getPrenom();
+ 		   String tel = list.get(i).getTitulaire().getTel()+"";
+ 		   String numcompte = list.get(i).getNumcompte();
+ 		   String solde = list.get(i).getSolde()+" DT ";
+ 		   String creation = list.get(i).getDate_creation();
+
+            row.add(fullname);
+            row.add(tel); 
+            row.add(numcompte); 
+            row.add(solde);
+            row.add(creation);
+            data.add(row);
+        }
+        panel_compte.setLayout(null);	
+        jTable = new JTable(data,header);
+
+	}
+
+	
 	
 	public void loadClientTable() {
 		CCli = new Client_controller();
@@ -597,7 +746,6 @@ public class bb {
     	arc = new ArrayList<Client>();
         arc = CCli.Get_Client();       
         Vector<String> header = new Vector<String>();
-
         header.add("NOM ET PRENOM"); 
         header.add("TELEPHONE");
         header.add("ADRESSE");
@@ -606,19 +754,15 @@ public class bb {
 		for (int i = 0; i < arc.size(); i++){
 
             Vector<Object> row = new Vector<Object>();
-
- 		   String fullname = arc.get(i).getNom()+" "+arc.get(i).getPrenom();
- 		   String tel = arc.get(i).getTel()+"";
- 		   String adress = arc.get(i).getAdress();
- 		   String Responsable = arc.get(i).getEmploye().getNom()+" "+arc.get(i).getEmploye().getPernom();
- 		   
-  
+ 		   	String fullname = arc.get(i).getNom()+" "+arc.get(i).getPrenom();
+ 		   	String tel = arc.get(i).getTel()+"";
+ 		   	String adress = arc.get(i).getAdress();
+ 		   	String Responsable = arc.get(i).getEmploye().getNom()+" "+arc.get(i).getEmploye().getPernom();
             row.add(fullname);
             row.add(tel); 
             row.add(adress); 
             row.add(Responsable);
             data.add(row);
-
         }
         panel_Client.setLayout(null);	
         table_3 = new JTable(data,header);

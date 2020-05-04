@@ -25,6 +25,13 @@ public class Compte {
 		this.solde = solde;
 		this.date_creation = date_creation;
 	}
+	public Compte(String numcompte, Client titulaire, int solde) {
+		super();
+		this.id = UUID.randomUUID().toString(); 
+		this.numcompte = numcompte;
+		this.titulaire = titulaire;
+		this.solde = solde;
+	}
 	public String getId() {
 		return id;
 	}
