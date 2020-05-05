@@ -33,7 +33,6 @@ public class main {
 		Compte compte1,compte2;
 		Transaction tr,tr2;
 		
-
 		ArrayList<Transaction> tarray2 = new ArrayList<Transaction>();
 		
 		tarray2 = tc.Get_Client_Transaction("1050010");

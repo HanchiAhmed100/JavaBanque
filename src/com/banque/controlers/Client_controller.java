@@ -37,7 +37,7 @@ public class Client_controller {
 		 try {
 			ArrayList<Client> mylist = new ArrayList<Client>();
 			stmt = con.createStatement();
-			String sql = "SELECT * FROM client LEFT JOIN employe ON client.employe = employe.e_id ORDER BY client.c_nom";
+			String sql = "SELECT * FROM client LEFT JOIN employe ON client.employe = employe.e_id WHERE client.cli_etat = 1 ORDER BY client.c_nom";
 			rs = stmt.executeQuery(sql);
 			System.out.println(rs);
 			while(rs.next()){
@@ -83,6 +83,7 @@ public class Client_controller {
 			e.printStackTrace();
 		}
 	}
+
 	public void Update_Client(Client c){
 		 try {
 			 pstmt = con.prepareStatement("UPDATE client SET c_nom = ?,c_prenom = ?,c_tel = ?,c_adress = ?,employe = ? WHERE c_id = ? ");
@@ -93,6 +94,17 @@ public class Client_controller {
 			 pstmt.setString(5, c.getEmploye().getId());
 			 pstmt.setString(6, c.getId());
 			 pstmt.executeUpdate();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void set_Inactive(Client c) {
+		 try {
+			 pstmt = con.prepareStatement("UPDATE client SET cli_etat = 0 WHERE c_id = ?  ");
+			 pstmt.setString(1, c.getId());
+			 pstmt.executeUpdate();	
+			 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

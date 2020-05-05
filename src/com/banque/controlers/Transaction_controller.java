@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
+import java.util.Vector;
 
 import com.banque.models.Client;
 import com.banque.models.Compte;
@@ -168,6 +169,30 @@ public class Transaction_controller {
 				mylist.add(tr);
 			}
 			return mylist;
+		} catch (SQLException e) {
+			e.printStackTrace();
+			return null;
+		}
+	 }
+	 
+     //Vector<Vector<Object>> data = new  Vector<Vector<Object>>();
+
+	 public ArrayList<ArrayList<Object>> Load_Transaction_By_Employe(String e_id){
+		try {
+			ArrayList<ArrayList<Object>> data = new  ArrayList<ArrayList<Object>>();
+			PreparedStatement  pstmt = con.prepareStatement("SELECT * FROM transaction WHERE e_id = ?");
+			pstmt.setString(1, e_id);
+			rs = pstmt.executeQuery();
+			while(rs.next()){
+				ArrayList<Object> row = new ArrayList<Object>();
+				row.add( rs.getString("t_type"));
+				row.add( rs.getString("c_emetteur"));
+				row.add( rs.getString("c_beneficiaire"));
+				row.add( rs.getString("montant"));
+				row.add( rs.getString("t_created_at"));
+				data.add(row);
+			}
+			return data;
 		} catch (SQLException e) {
 			e.printStackTrace();
 			return null;

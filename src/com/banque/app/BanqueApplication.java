@@ -22,6 +22,7 @@ import javax.swing.JButton;
 import java.awt.Font;
 import java.awt.Insets;
 import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
 import javax.swing.border.MatteBorder;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.JPasswordField;
@@ -46,15 +47,17 @@ public class BanqueApplication {
 	private Compte cEmetteur,cBenef,compte;
 	private Compte_controller cc;
 	private Employe_controller ec;
-	private Employe employe;
+	private Employe employe ,employee;
 	private Transaction_controller tc;
-	private Transaction transaction; 
+	private Transaction transaction,transac; 
 	private Client_controller CCli;
 	private Client client, Newclient;
 	private ArrayList<Client> arc ;
 	private ArrayList<Client> titulairesArray ;
 	private ArrayList<Compte> list;
 	private ArrayList<Transaction> TransactionArray , TransactionArrayRecherche;
+	private ArrayList<Employe> EmployeArray ;
+
 	private int numCompte;
 	private String type;
 	
@@ -79,7 +82,7 @@ public class BanqueApplication {
 	private JTextField phonetextfield;
 	private JTextField adressetextfield;
 	private JScrollPane scrollPane,scrollPane_compte;
-	private JTable jTable,mytable;
+	private JTable jTable,mytable,employee_table,RechercheTransactionEmpolye;
 	private JPanel panel_5;
 	private JComboBox titulaire ;
 	private DefaultListModel<String> modelComboBox;
@@ -100,6 +103,15 @@ public class BanqueApplication {
 	private JLabel lblNewLabel_12;
 	private JTextField rechercheend;
 	private JScrollPane transactionScrollPan;
+	private JButton btnNewButton_5;
+	private JButton btnNewButton_6;
+	private JPanel panel_employe;
+	private JTextField e_name;
+	private JTextField e_lastname;
+	private JTextField e_mail;
+	private JTextField e_passwd;
+	private JButton btnNewButton_8;
+	private JTextField rechercheEmp;
 
 	/**
 	 * Launch the application.
@@ -168,7 +180,7 @@ public class BanqueApplication {
 				ec.Connexion();
 				employe = ec.Login(login, mdp);
 				if(employe != null ) {
-					JOptionPane.showMessageDialog(null, " Bienvenue "+employe.getNom() +" "+employe.getMotdepasse() +" :D <3  " );	
+					JOptionPane.showMessageDialog(null, " Bienvenue "+employe.getNom() +" "+employe.getPernom() +" :D <3  " );	
 					panel_1.setVisible(true);
 					layeredPane.removeAll();
 					layeredPane.add(panel_transaction);
@@ -409,8 +421,8 @@ public class BanqueApplication {
 					tc = new Transaction_controller();
 					tc.Connexion();
 					if( type == "virement") {
-						transaction = new Transaction(type, cEmetteur, cBenef,mnt,employe);
-						tc.virement(transaction);
+						transac = new Transaction(type, cEmetteur, cBenef,mnt,employe);
+						tc.virement(transac);
 						int CompteEmetteurIndex = 0 , CompteBenfIndex = 0;
 						int EmetteurSolde = 0 , BenefSold = 0;
 						for(int i = 0; i < list.size();i++) {
@@ -427,10 +439,11 @@ public class BanqueApplication {
 					    jTable.setModel(ChangeSoldeEmetteurAndBenf);
 					    ChangeSoldeEmetteurAndBenf.setValueAt(EmetteurSolde+"",CompteEmetteurIndex , 3);
 					    ChangeSoldeEmetteurAndBenf.setValueAt(BenefSold+"",CompteBenfIndex , 3);
-
+						AddTransaction();
+					   
 					}else if(type == "versement"){
-						transaction = new Transaction(type,cBenef,mnt,employe);
-						tc.Versement(transaction);
+						transac = new Transaction(type,cBenef,mnt,employe);
+						tc.Versement(transac);
 						int CompteBenfIndex = 0;
 						int BenefSold = 0;
 						for(int i = 0; i < list.size();i++) {
@@ -442,10 +455,11 @@ public class BanqueApplication {
 						DefaultTableModel ChangeSoldeEmetteurAndBenf = (DefaultTableModel) jTable.getModel();
 					    jTable.setModel(ChangeSoldeEmetteurAndBenf);
 					    ChangeSoldeEmetteurAndBenf.setValueAt(BenefSold+"",CompteBenfIndex , 3);
+						AddTransaction();
 						
 					}else {
-						transaction = new Transaction(type,cBenef,mnt,employe);
-						tc.Retrait(transaction);
+						transac = new Transaction(type,cBenef,mnt,employe);
+						tc.Retrait(transac);
 						int CompteBenfIndex = 0;
 						int BenefSold = 0;
 						for(int i = 0; i < list.size();i++) {
@@ -457,6 +471,7 @@ public class BanqueApplication {
 						DefaultTableModel ChangeSoldeEmetteurAndBenf = (DefaultTableModel) jTable.getModel();
 					    jTable.setModel(ChangeSoldeEmetteurAndBenf);
 					    ChangeSoldeEmetteurAndBenf.setValueAt(BenefSold+"",CompteBenfIndex , 3);
+						AddTransaction();
 					}
 					JOptionPane.showMessageDialog(null, " Transaction effectuer " );
 					resetForm();
@@ -511,7 +526,7 @@ public class BanqueApplication {
 		addtransaction.setFocusable(false);
 		addtransaction.setForeground(Color.WHITE);
 		addtransaction.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 17));
-		addtransaction.setBounds(20, 0, 348, 41);
+		addtransaction.setBounds(20, 0, 345, 41);
 		panel_transaction.add(addtransaction);
 		
 		btnListeTransaction = new JButton("Liste Transaction");
@@ -528,7 +543,7 @@ public class BanqueApplication {
 		btnListeTransaction.setBackground(new Color(34, 45, 65));
 		btnListeTransaction.setForeground(Color.WHITE);
 		btnListeTransaction.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 17));
-		btnListeTransaction.setBounds(367, 0, 365, 41);
+		btnListeTransaction.setBounds(365, 0, 367, 41);
 		panel_transaction.add(btnListeTransaction);
 		
 		TransactionListHolder = new JPanel();
@@ -558,7 +573,6 @@ public class BanqueApplication {
 							}
 							table_transaction.setModel(tableModelCompte);
 							for(int i = 0 ; i < TransactionArrayRecherche.size();i++ ) {
-								System.out.println(TransactionArrayRecherche.get(i));
 					           	String fullname = " ";
 					            String emet = " ";
 					            if(TransactionArrayRecherche.get(i).getBeneficiaire() != null) {
@@ -569,10 +583,9 @@ public class BanqueApplication {
 					 		   	String montant = TransactionArrayRecherche.get(i).getMontant()+" ";
 					 		   	String emetteur = TransactionArrayRecherche.get(i).getEmetteur().getTitulaire().getNom()+" "+TransactionArrayRecherche.get(i).getEmetteur().getTitulaire().getPrenom();
 					 		   	String EmCompte = TransactionArrayRecherche.get(i).getEmetteur().getNumcompte();
-					 		   	String solde = TransactionArrayRecherche.get(i).getEmetteur().getSolde()+" ";
 					 		   	String Responsable = TransactionArrayRecherche.get(i).getResponsable().getMail();
 					 		   	String date = TransactionArrayRecherche.get(i).getDate_transaction();								
-							    tableModelCompte.addRow(new Object[]{emetteur ,EmCompte,transaction,fullname,emet,montant,solde,Responsable,date});						
+							    tableModelCompte.addRow(new Object[]{emetteur ,EmCompte,transaction,fullname,emet,montant,Responsable,date});						
 							}
 						}
 					}else if(!rechergebegin.getText().isEmpty() && rechercheend.getText().isEmpty() ) {
@@ -584,7 +597,6 @@ public class BanqueApplication {
 							}
 							table_transaction.setModel(tableModelCompte);
 							for(int i = 0 ; i < TransactionArrayRecherche.size();i++ ) {
-								System.out.println(TransactionArrayRecherche.get(i));
 					           	String fullname = " ";
 					            String emet = " ";
 					            if(TransactionArrayRecherche.get(i).getBeneficiaire() != null) {
@@ -595,16 +607,14 @@ public class BanqueApplication {
 					 		   	String montant = TransactionArrayRecherche.get(i).getMontant()+" ";
 					 		   	String emetteur = TransactionArrayRecherche.get(i).getEmetteur().getTitulaire().getNom()+" "+TransactionArrayRecherche.get(i).getEmetteur().getTitulaire().getPrenom();
 					 		   	String EmCompte = TransactionArrayRecherche.get(i).getEmetteur().getNumcompte();
-					 		   	String solde = TransactionArrayRecherche.get(i).getEmetteur().getSolde()+" ";
 					 		   	String Responsable = TransactionArrayRecherche.get(i).getResponsable().getMail();
 					 		   	String date = TransactionArrayRecherche.get(i).getDate_transaction();								
-							    tableModelCompte.addRow(new Object[]{emetteur ,EmCompte,transaction,fullname,emet,montant,solde,Responsable,date});						
+							    tableModelCompte.addRow(new Object[]{emetteur ,EmCompte,transaction,fullname,emet,montant,Responsable,date});						
 							}
 						}else {
 							JOptionPane.showMessageDialog(null, "Date Format Annee-mois-jour exemple 2020-05-01" );	
 						}
 					}else {
-						System.out.println(" begin - end ");
 						if(rechergebegin.getText().matches("\\d{4}-\\d{2}-\\d{2}") && rechercheend.getText().matches("\\d{4}-\\d{2}-\\d{2}")) {
 							TransactionArrayRecherche = tc.Get_Client_Transaction_by_date(recherchenum.getText(),rechergebegin.getText(),rechercheend.getText());
 							DefaultTableModel tableModelCompte = (DefaultTableModel) table_transaction.getModel();
@@ -613,7 +623,6 @@ public class BanqueApplication {
 							}
 							table_transaction.setModel(tableModelCompte);
 							for(int i = 0 ; i < TransactionArrayRecherche.size();i++ ) {
-								System.out.println(TransactionArrayRecherche.get(i));
 					           	String fullname = " ";
 					            String emet = " ";
 					            if(TransactionArrayRecherche.get(i).getBeneficiaire() != null) {
@@ -624,10 +633,9 @@ public class BanqueApplication {
 					 		   	String montant = TransactionArrayRecherche.get(i).getMontant()+" ";
 					 		   	String emetteur = TransactionArrayRecherche.get(i).getEmetteur().getTitulaire().getNom()+" "+TransactionArrayRecherche.get(i).getEmetteur().getTitulaire().getPrenom();
 					 		   	String EmCompte = TransactionArrayRecherche.get(i).getEmetteur().getNumcompte();
-					 		   	String solde = TransactionArrayRecherche.get(i).getEmetteur().getSolde()+" ";
 					 		   	String Responsable = TransactionArrayRecherche.get(i).getResponsable().getMail();
 					 		   	String date = TransactionArrayRecherche.get(i).getDate_transaction();								
-							    tableModelCompte.addRow(new Object[]{emetteur ,EmCompte,transaction,fullname,emet,montant,solde,Responsable,date});						
+							    tableModelCompte.addRow(new Object[]{emetteur ,EmCompte,transaction,fullname,emet,montant,Responsable,date});						
 							}
 						}else {
 							JOptionPane.showMessageDialog(null, "Date Format Annee-mois-jour exemple 2020-05-01" );	
@@ -672,7 +680,7 @@ public class BanqueApplication {
 		
 		rechercheend = new JTextField();
 		rechercheend.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 11));
-		rechercheend.setBounds(444, 33, 119, 20);
+		rechercheend.setBounds(444, 33, 147, 20);
 		TransactionListHolder.add(rechercheend);
 		rechercheend.setColumns(10);
 		
@@ -682,6 +690,15 @@ public class BanqueApplication {
 		TransactionListHolder.add(transactionScrollPan);
 		
 		JButton btnNewButton_4 = new JButton("Annuler");
+		btnNewButton_4.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) {
+				rechercheend.setText("");
+				recherchenum.setText("");
+				rechergebegin.setText("");
+				ReloadTransaction();
+				
+			}
+		});
 		btnNewButton_4.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
 		btnNewButton_4.setBounds(146, 62, 139, 23);
 		TransactionListHolder.add(btnNewButton_4);
@@ -692,7 +709,7 @@ public class BanqueApplication {
 	
 		loadComptesTable();
 		scrollPane_compte = new JScrollPane(jTable);
-		scrollPane_compte.setBounds(10, 191, 734, 291);
+		scrollPane_compte.setBounds(10, 163, 734, 283);
         panel_compte.add(scrollPane_compte);
         
         panel_5 = new JPanel();
@@ -749,6 +766,7 @@ public class BanqueApplication {
         newCompteSolde.setColumns(10);
         
         JButton btnNewButton = new JButton("Valider");
+        btnNewButton.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
         btnNewButton.addActionListener(new ActionListener() {
         	public void actionPerformed(ActionEvent e) {
         		if(newCompteSolde.getText() != "" || Newclient != null ) {
@@ -768,18 +786,46 @@ public class BanqueApplication {
         });
         btnNewButton.setBounds(10, 71, 131, 23);
         panel_6.add(btnNewButton);
+        
+        btnNewButton_5 = new JButton("Supprimer");
+        btnNewButton_5.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        btnNewButton_5.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		int column = 2 ;
+        		int row = jTable.getSelectedRow();
+        		System.out.println(row);
+        		if(row == -1) {
+					JOptionPane.showMessageDialog(null, "Veuillez selectionner le compte a supprimer" );	
+        		}else {
+            		String value = jTable.getModel().getValueAt(row, column).toString();
+            		System.out.println(row+" row "+value);
+            		for(int i = 0; i < list.size();i++) {
+            			if(list.get(i).getNumcompte()== value) {
+            				Compte_controller conCT = new Compte_controller();
+            				conCT.Connexion();
+            				conCT.Set_Inactive(list.get(i).getId()); 
+        					JOptionPane.showMessageDialog(null, "Compte Supprimer");	
+    						DefaultTableModel RemoveClient = (DefaultTableModel) jTable.getModel();
+    						RemoveClient.removeRow(jTable.getSelectedRow());	
+            			}
+            		}	
+        		}
+        	}
+        });
+        btnNewButton_5.setBounds(43, 455, 116, 23);
+        panel_compte.add(btnNewButton_5);
 		
 		panel_Client = new JPanel();
 		layeredPane.add(panel_Client, "name_195965575302300");        
 
 		loadClientTable();
         scrollPane = new JScrollPane(table_3);        
-        scrollPane.setBounds(10, 191, 734, 291);
+        scrollPane.setBounds(10, 159, 734, 291);
         panel_Client.add(scrollPane);
         
         
         JPanel panel_2 = new JPanel();
-        panel_2.setBounds(10, 25, 734, 153);
+        panel_2.setBounds(10, 11, 734, 137);
         panel_Client.add(panel_2);
         panel_2.setLayout(null);
         
@@ -871,6 +917,197 @@ public class BanqueApplication {
         });
         btnNewButton_3.setBounds(197, 103, 110, 23);
         panel_2.add(btnNewButton_3);
+        
+        btnNewButton_6 = new JButton("Supprimer");
+        btnNewButton_6.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		
+        		int column = 2 ;
+        		int row = table_3.getSelectedRow();
+        		System.out.println(row);
+        		if(row == -1) {
+					JOptionPane.showMessageDialog(null, "Veuillez selectionner le client à supprimer" );	
+        		}else {
+    				Client_controller cliCT = new Client_controller();
+    				cliCT.Connexion();
+    				cliCT.set_Inactive(arc.get(row)); 
+					JOptionPane.showMessageDialog(null, " Compte Supprimer");	
+					DefaultTableModel RemoveClient = (DefaultTableModel) table_3.getModel();
+					RemoveClient.removeRow(table_3.getSelectedRow());	
+        		}
+        	}
+        });
+        btnNewButton_6.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        btnNewButton_6.setBounds(36, 460, 121, 23);
+        panel_Client.add(btnNewButton_6);
+        
+        panel_employe = new JPanel();
+        layeredPane.add(panel_employe, "name_365327525324000");
+        panel_employe.setLayout(null);
+        
+        JPanel panel_8 = new JPanel();
+        panel_8.setBounds(10, 33, 734, 83);
+        panel_employe.add(panel_8);
+        panel_8.setLayout(null);
+        
+        JLabel lblNewLabel_13 = new JLabel("Nom : ");
+        lblNewLabel_13.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        lblNewLabel_13.setBounds(0, 27, 92, 14);
+        panel_8.add(lblNewLabel_13);
+        
+        e_name = new JTextField();
+        e_name.setBounds(41, 25, 113, 20);
+        panel_8.add(e_name);
+        e_name.setColumns(10);
+        
+        JLabel lblNewLabel_14 = new JLabel("Prenom :");
+        lblNewLabel_14.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        lblNewLabel_14.setBounds(158, 27, 63, 14);
+        panel_8.add(lblNewLabel_14);
+        
+        e_lastname = new JTextField();
+        e_lastname.setBounds(214, 25, 122, 20);
+        panel_8.add(e_lastname);
+        e_lastname.setColumns(10);
+        
+        JLabel lblNewLabel_15 = new JLabel("E-mail :");
+        lblNewLabel_15.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        lblNewLabel_15.setBounds(339, 27, 58, 14);
+        panel_8.add(lblNewLabel_15);
+        
+        e_mail = new JTextField();
+        e_mail.setBounds(387, 25, 113, 20);
+        panel_8.add(e_mail);
+        e_mail.setColumns(10);
+        
+        e_passwd = new JTextField();
+        e_passwd.setBounds(602, 25, 122, 20);
+        panel_8.add(e_passwd);
+        e_passwd.setColumns(10);
+        
+        JLabel lblNewLabel_16 = new JLabel("Mot de passe :");
+        lblNewLabel_16.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        lblNewLabel_16.setBounds(510, 27, 82, 14);
+        panel_8.add(lblNewLabel_16);
+        
+        JButton btnNewButton_7 = new JButton("Valider");
+        btnNewButton_7.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(e_name.getText().isEmpty() || e_lastname.getText().isEmpty() || e_mail.getText().isEmpty() || e_passwd.getText().isEmpty()) {
+					JOptionPane.showMessageDialog(null, "Les champs sont obligatoire ! " );		
+        		}else {
+        			Employe employeNv = new Employe(e_name.getText(), e_lastname.getText(), e_mail.getText(), e_passwd.getText());
+        			Employe_controller Empcont = new Employe_controller();
+        			Empcont.Connexion();
+        			Empcont.Add_Employe(employeNv);
+        			
+        			DefaultTableModel updateTableEmp = (DefaultTableModel) employee_table.getModel();
+        			employee_table.setModel(updateTableEmp);
+        			updateTableEmp.addRow(new Object[]{employeNv.getId(),employeNv.getNom(),employeNv.getPernom(), employeNv.getMail()});						
+        			EmployeArray.add(employeNv);
+        			resetEmployeForm();
+					JOptionPane.showMessageDialog(null, "Employe ajouter ! " );		
+        		}
+        	}
+        });
+        btnNewButton_7.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        btnNewButton_7.setBounds(41, 52, 113, 23);
+        panel_8.add(btnNewButton_7);
+        
+        btnNewButton_8 = new JButton("Annuler");
+        btnNewButton_8.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+
+        		resetEmployeForm();
+        	}
+        });
+        btnNewButton_8.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        btnNewButton_8.setBounds(168, 52, 106, 23);
+        panel_8.add(btnNewButton_8);
+        
+        JLabel lblNewLabel_17 = new JLabel("Ajouter employe");
+        lblNewLabel_17.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 18));
+        lblNewLabel_17.setBounds(293, 0, 139, 30);
+        panel_employe.add(lblNewLabel_17);
+        
+        RechercheEmpTran();
+        JScrollPane scrollPane_2 = new JScrollPane(RechercheTransactionEmpolye);
+        scrollPane_2.setBounds(10, 336, 734, 147);
+        panel_employe.add(scrollPane_2);
+        
+        
+		LoadEmployeTable();
+        JScrollPane scrollPane_1 = new JScrollPane(employee_table);
+        scrollPane_1.setBounds(10, 152, 734, 147);
+        panel_employe.add(scrollPane_1);
+        
+        JLabel lblNewLabel_18 = new JLabel("Liste des Employe");
+        lblNewLabel_18.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 15));
+        lblNewLabel_18.setBounds(10, 124, 191, 30);
+        panel_employe.add(lblNewLabel_18);
+        
+        JLabel lblTransactionParEmploye = new JLabel("Transaction Par employe ID : ");
+        lblTransactionParEmploye.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 15));
+        lblTransactionParEmploye.setBounds(10, 305, 191, 30);
+        panel_employe.add(lblTransactionParEmploye);
+        
+        rechercheEmp = new JTextField();
+        rechercheEmp.setBounds(211, 313, 248, 20);
+        panel_employe.add(rechercheEmp);
+        rechercheEmp.setColumns(10);
+        
+        JButton btnNewButton_9 = new JButton("Valider");
+        btnNewButton_9.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		if(!rechercheEmp.getText().isEmpty()) {
+        			LoadTransactionbyEmp();
+        		}else {
+					JOptionPane.showMessageDialog(null, " Champ obligatoire ");
+        		}
+        	}
+        });
+        btnNewButton_9.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        btnNewButton_9.setBounds(469, 311, 128, 23);
+        panel_employe.add(btnNewButton_9);
+        
+        JButton btnNewButton_10 = new JButton("Annuler");
+        btnNewButton_10.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent arg0) {
+        		rechercheEmp.setText("");
+        		DefaultTableModel tableEmployeTransaction = (DefaultTableModel) RechercheTransactionEmpolye.getModel();
+        		while (tableEmployeTransaction.getRowCount()>0){
+        			tableEmployeTransaction.removeRow(0);
+        		}	
+        	}
+        });
+        btnNewButton_10.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        btnNewButton_10.setBounds(607, 310, 128, 23);
+        panel_employe.add(btnNewButton_10);
+        
+        JButton SupprimerEmploye = new JButton("Supprimer");
+        SupprimerEmploye.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+        		int column = 0 ;
+        		int row = employee_table.getSelectedRow();
+        		System.out.println(row);
+        		if(row == -1) {
+					JOptionPane.showMessageDialog(null, "Veuillez selectionner l'employe a supprimer" );	
+        		}else {
+            		String value = employee_table.getModel().getValueAt(row, column).toString();
+            		ec = new Employe_controller();
+            		ec.Connexion();
+            		ec.Desactivate_Employe(value);
+					DefaultTableModel RemoveEmploye = (DefaultTableModel) employee_table.getModel();
+					RemoveEmploye.removeRow(employee_table.getSelectedRow());
+					JOptionPane.showMessageDialog(null, "Employe supprimer" );	
+
+        		}
+        		
+        	}
+        });
+        SupprimerEmploye.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 13));
+        SupprimerEmploye.setBounds(607, 124, 126, 23);
+        panel_employe.add(SupprimerEmploye);
 
         
         JButton button_1 = new JButton("Clients");
@@ -889,7 +1126,7 @@ public class BanqueApplication {
         button_1.setFocusPainted(false);
         button_1.setBorder(new MatteBorder(1, 1, 2, 1, (Color) new Color(255, 255, 255)));
         button_1.setBackground(new Color(34, 45, 65));
-        button_1.setBounds(486, 2, 268, 45);
+        button_1.setBounds(365, 2, 203, 45);
         panel_1.add(button_1);
         
         JButton button_8 = new JButton("Compte");
@@ -908,7 +1145,7 @@ public class BanqueApplication {
         button_8.setFocusPainted(false);
         button_8.setBorder(new MatteBorder(1, 1, 2, 1, (Color) new Color(255, 255, 255)));
         button_8.setBackground(new Color(34, 45, 65));
-        button_8.setBounds(0, 2, 251, 45);
+        button_8.setBounds(0, 2, 182, 45);
         panel_1.add(button_8);
         
         JButton button_9 = new JButton("Transaction");
@@ -926,13 +1163,45 @@ public class BanqueApplication {
         button_9.setFocusPainted(false);
         button_9.setBorder(new MatteBorder(1, 1, 2, 1, (Color) new Color(255, 255, 255)));
         button_9.setBackground(new Color(34, 45, 65));
-        button_9.setBounds(248, 2, 240, 45);
+        button_9.setBounds(179, 2, 187, 45);
         panel_1.add(button_9);
-		
-
-
+        
+        JButton btnEmploye = new JButton("Employe");
+        btnEmploye.addActionListener(new ActionListener() {
+        	public void actionPerformed(ActionEvent e) {
+				layeredPane.removeAll();
+				layeredPane.add(panel_employe);
+				layeredPane.repaint();
+				layeredPane.revalidate();
+        	}
+        });
+        btnEmploye.setForeground(Color.WHITE);
+        btnEmploye.setFont(new Font("Yu Gothic UI Semilight", Font.PLAIN, 18));
+        btnEmploye.setFocusable(false);
+        btnEmploye.setFocusTraversalKeysEnabled(false);
+        btnEmploye.setFocusPainted(false);
+        btnEmploye.setBorder(new MatteBorder(1, 1, 2, 1, (Color) new Color(255, 255, 255)));
+        btnEmploye.setBackground(new Color(34, 45, 65));
+        btnEmploye.setBounds(567, 2, 187, 45);
+        panel_1.add(btnEmploye);
 	}
-
+	protected void LoadTransactionbyEmp() {
+		Transaction_controller ttc = new Transaction_controller();
+		ttc.Connexion();
+		ArrayList<ArrayList<Object>> data = ttc.Load_Transaction_By_Employe(rechercheEmp.getText());
+		DefaultTableModel tableEmployeTransaction = (DefaultTableModel) RechercheTransactionEmpolye.getModel();
+		RechercheTransactionEmpolye.setModel(tableEmployeTransaction);
+		while (tableEmployeTransaction.getRowCount()>0){
+			tableEmployeTransaction.removeRow(0);
+		}
+		for(int i = 0 ; i < data.size(); i++ ) {
+			ArrayList<Object> ob = data.get(i);
+			for(int j = 0 ; j < ob.size(); j++) {
+				System.out.println(" j : "+j+" -- "+ob.get(j));
+			}
+			tableEmployeTransaction.addRow(new Object[]{ob.get(0),ob.get(1),ob.get(2),ob.get(3),ob.get(4)});						
+		}
+	}
 
 	public void loadTitulairComboBox() {
 		CCli = new Client_controller();
@@ -942,49 +1211,78 @@ public class BanqueApplication {
 		for (int i = 0; i < titulairesArray.size(); i++){
 			titulaire.addItem(titulairesArray.get(i).getPrenom()+" "+titulairesArray.get(i).getNom()+" ");
 		}
-
 	}
-
+	public void RechercheEmpTran() {
+		Vector<String> header = new Vector<String>();
+        header.add("Transaction"); 
+        header.add("EMETTEUR");
+        header.add("BENEFICIAIRE");
+        header.add("MONTANT");
+        header.add("DATE");
+        Vector<Vector<Object>> data = new  Vector<Vector<Object>>();
+        panel_employe.setLayout(null);	
+        RechercheTransactionEmpolye = new JTable(data,header);
+        RechercheTransactionEmpolye.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	}
+	
+	public void LoadEmployeTable() {
+		ec = new Employe_controller();
+		ec.Connexion();
+		EmployeArray = new ArrayList<Employe>();
+		EmployeArray = ec.Get_Emplye();   
+        Vector<String> header = new Vector<String>();
+        header.add("ID"); 
+        header.add("Nom");
+        header.add("Prenom");
+        header.add("mail");
+        Vector<Vector<Object>> data = new  Vector<Vector<Object>>();
+		for (int i = 0; i < EmployeArray.size(); i++){
+           Vector<Object> row = new Vector<Object>();
+ 		   String id = EmployeArray.get(i).getId();
+ 		   String nom = EmployeArray.get(i).getNom();
+ 		   String prenom = EmployeArray.get(i).getPernom() ;
+ 		   String mail = EmployeArray.get(i).getMail();
+           row.add(id);
+           row.add(nom); 
+           row.add(prenom); 
+           row.add(mail);
+           data.add(row);
+        }		
+        panel_employe.setLayout(null);	
+        employee_table = new JTable(data,header);
+        employee_table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+	}	
 	public void loadComptesTable() {
     	cc = new Compte_controller();
     	cc.Connexion();
 	    list = new ArrayList<Compte>();
-        list = cc.Get_Comptes();
-        
+        list = cc.Get_Comptes();   
         Vector<String> header = new Vector<String>();
-        
         header.add("NOM ET PRENOM"); 
         header.add("TELEPHONE");
         header.add("COMPTE");
         header.add("SOLDE");
         header.add("DATE DE CREATION" );
-
         Vector<Vector<Object>> data = new  Vector<Vector<Object>>();
 		for (int i = 0; i < list.size(); i++){
-
            Vector<Object> row = new Vector<Object>();
  		   String fullname = list.get(i).getTitulaire().getNom()+" "+list.get(i).getTitulaire().getPrenom();
  		   String tel = list.get(i).getTitulaire().getTel()+"";
  		   String numcompte = list.get(i).getNumcompte();
  		   String solde = list.get(i).getSolde()+" DT ";
  		   String creation = list.get(i).getDate_creation();
-
-            row.add(fullname);
-            row.add(tel); 
-            row.add(numcompte); 
-            row.add(solde);
-            row.add(creation);
-            data.add(row);
+           row.add(fullname);
+           row.add(tel); 
+           row.add(numcompte); 
+           row.add(solde);
+           row.add(creation);
+           data.add(row);
         }		
-		
-		
         panel_compte.setLayout(null);	
         jTable = new JTable(data,header);
-
+        jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	}
 
-	
-	
 	public void loadClientTable() {
 		CCli = new Client_controller();
 		CCli.Connexion();
@@ -997,7 +1295,6 @@ public class BanqueApplication {
         header.add("RESPONSABLE");
         Vector<Vector<Object>> data = new  Vector<Vector<Object>>();
 		for (int i = 0; i < arc.size(); i++){
-
             Vector<Object> row = new Vector<Object>();
  		   	String fullname = arc.get(i).getNom()+" "+arc.get(i).getPrenom();
  		   	String tel = arc.get(i).getTel()+"";
@@ -1011,6 +1308,8 @@ public class BanqueApplication {
         }
         panel_Client.setLayout(null);	
         table_3 = new JTable(data,header);
+        table_3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
 	}
 	public void LoadTransaction() {
 		tc =  new Transaction_controller();
@@ -1025,14 +1324,12 @@ public class BanqueApplication {
         header.add("BENEFICIAIRE"); 
         header.add("COMPTE ");
         header.add("MONTANT");
-        header.add("SOLDE");
         header.add("Responsable");
         header.add("DATE");
         Vector<Vector<Object>> data = new  Vector<Vector<Object>>();
 
     	TransactionArray = tc.Get_transactions();
 		for (int i = 0; i < TransactionArray.size(); i++){
-			System.out.println(TransactionArray.get(i).getResponsable());
             Vector<Object> row = new Vector<Object>();
             String fullname = " ";
             String emet = " ";
@@ -1044,7 +1341,6 @@ public class BanqueApplication {
  		   	String montant = TransactionArray.get(i).getMontant()+" ";
  		   	String emetteur = TransactionArray.get(i).getEmetteur().getTitulaire().getNom()+" "+TransactionArray.get(i).getEmetteur().getTitulaire().getPrenom();
  		   	String EmCompte = TransactionArray.get(i).getEmetteur().getNumcompte();
- 		   	String solde = TransactionArray.get(i).getEmetteur().getSolde()+" ";
  		   	String Responsable = TransactionArray.get(i).getResponsable().getMail();
  		   	String date = TransactionArray.get(i).getDate_transaction();
             row.add(emetteur);
@@ -1053,15 +1349,60 @@ public class BanqueApplication {
             row.add(fullname);
             row.add(emet); 
             row.add(montant); 
-            row.add(solde); 
             row.add(Responsable);
             row.add(date);
 
             data.add(row);
         }
         panel_transaction.setLayout(null);	
-        table_transaction = new JTable(data,header);
+        table_transaction = new JTable(data,header);        
+        table_transaction.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 
+	}
+	public void ReloadTransaction() {
+	
+		DefaultTableModel tableModelCompte = (DefaultTableModel) table_transaction.getModel();
+		while (tableModelCompte.getRowCount()>0){
+			tableModelCompte.removeRow(0);
+		}
+		table_transaction.setModel(tableModelCompte);
+		for(int i = 0 ; i < TransactionArray.size();i++ ) {
+           	String fullname = " ";
+            String emet = " ";
+            if(TransactionArray.get(i).getBeneficiaire() != null) {
+            	fullname =  TransactionArray.get(i).getBeneficiaire().getTitulaire().getNom()+" "+TransactionArray.get(i).getBeneficiaire().getTitulaire().getPrenom();
+            	emet = TransactionArray.get(i).getBeneficiaire().getNumcompte();	
+            }
+ 		   	String transaction = TransactionArray.get(i).getType();
+ 		   	String montant = TransactionArray.get(i).getMontant()+" ";
+ 		   	String emetteur = TransactionArray.get(i).getEmetteur().getTitulaire().getNom()+" "+TransactionArray.get(i).getEmetteur().getTitulaire().getPrenom();
+ 		   	String EmCompte = TransactionArray.get(i).getEmetteur().getNumcompte();
+ 		   	String Responsable = TransactionArray.get(i).getResponsable().getMail();
+ 		   	String date = TransactionArray.get(i).getDate_transaction();								
+		    tableModelCompte.addRow(new Object[]{emetteur ,EmCompte,transaction,fullname,emet,montant,Responsable,date});						
+		}
+	}
+	public void AddTransaction() {
+		 DefaultTableModel TrArray = (DefaultTableModel) table_transaction.getModel();
+		    table_transaction.setModel(TrArray);
+        	 String fullname = " ";
+	         String emet = " ";
+	         String emetteur = "";
+	         String EmCompte = "";
+	         if(transac.getBeneficiaire() != null) {
+	         	fullname =  transac.getBeneficiaire().getTitulaire().getNom()+" "+transac.getBeneficiaire().getTitulaire().getPrenom();
+	         	emet = transac.getBeneficiaire().getNumcompte();	
+	         }
+		   	String transactions = transac.getType();
+		   	if( transac.getEmetteur() != null) {
+		   		 emetteur = transac.getEmetteur().getTitulaire().getNom()+" "+transac.getEmetteur().getTitulaire().getPrenom();
+			   	 EmCompte = transac.getEmetteur().getNumcompte();
+		   	}
+		   	String montant = transac.getMontant()+"";
+		   	String Responsable = transac.getResponsable().getMail();
+		   	String date = "Maintenent";	
+		    TrArray.addRow(new Object[]{emetteur ,EmCompte,transactions,fullname,emet,montant,Responsable,date});						
+		    TransactionArray.add(transac);
 	}
 	
 	public void resetForm() {
@@ -1074,5 +1415,11 @@ public class BanqueApplication {
 		panel_emetteur.setVisible(false);
 		panel_benef.setVisible(false);
 		panel_solde.setVisible(false);	
+	}
+	public void resetEmployeForm() {
+		e_name.setText("");
+		e_lastname.setText("");
+		e_mail.setText("");
+		e_passwd.setText("");	
 	}
 }

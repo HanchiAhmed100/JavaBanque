@@ -38,7 +38,7 @@ public class Compte_controller {
 		 try {
 			ArrayList<Compte> mylist = new ArrayList<Compte>();
 			stmt = con.createStatement();
-			String sql = "SELECT * FROM compte LEFT JOIN client ON compte.titulaire = client.c_id ORDER BY client.c_nom";
+			String sql = "SELECT * FROM compte LEFT JOIN client ON compte.titulaire = client.c_id WHERE compte.cp_etat = 1  ORDER BY client.c_nom";
 			rs = stmt.executeQuery(sql);
 			System.out.println(rs);
 			while(rs.next()){
@@ -54,7 +54,7 @@ public class Compte_controller {
 	}
 	public Compte Get_One_Compte(String num_compte){
 		 try {
-			pstmt = con.prepareStatement("SELECT * FROM compte LEFT JOIN client ON compte.titulaire = client.c_id WHERE compte.num_compte = ?");
+			pstmt = con.prepareStatement("SELECT * FROM compte LEFT JOIN client ON compte.titulaire = client.c_id WHERE compte.num_compte = ? AND compte.cp_etat = 1 ");
 			pstmt.setString(1,num_compte);
 			rs = pstmt.executeQuery();
 			while(rs.next()){
@@ -95,7 +95,16 @@ public class Compte_controller {
 			return 0;
 		}    
 	}
-
+	public void Set_Inactive(String id){
+		 try {
+			 pstmt = con.prepareStatement("UPDATE compte SET cp_etat = 0 WHERE id = ? ");
+			 pstmt.setString(1,id);
+			 pstmt.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 	public void Delete_Compte(String id){
 		 try {
 			 pstmt = con.prepareStatement("DELETE FROM compte where id = ? ");

@@ -36,7 +36,7 @@ public class Employe_controller {
 		 try {
 			ArrayList<Employe> mylist = new ArrayList<Employe>();
 			stmt = con.createStatement();
-			String sql = "SELECT * FROM employe";
+			String sql = "SELECT * FROM employe WHERE emp_etat = 1";
 			rs = stmt.executeQuery(sql);
 			System.out.println(rs);
 			while(rs.next()){
@@ -51,7 +51,7 @@ public class Employe_controller {
 	}
 	public Employe Get_One_Employe(String e_id){
 		 try {
-			pstmt = con.prepareStatement("SELECT * FROM employe WHERE e_id = ?");
+			pstmt = con.prepareStatement("SELECT * FROM employe WHERE e_id = ? ");
 			pstmt.setString(1,e_id);
 			rs = pstmt.executeQuery();
 			while(rs.next()){
@@ -65,12 +65,13 @@ public class Employe_controller {
 	}
 	public void Add_Employe(Employe em){
 		 try {
+			 System.out.println(em);
 			 pstmt = con.prepareStatement("INSERT INTO employe (e_id , e_nom , e_prenom , e_mail , e_motdepasse) VALUES (?,?,?,?,?)");
-			 pstmt.setString(1, em.getId());
-			 pstmt.setString(2, em.getNom());
-			 pstmt.setString(3, em.getPernom());
-			 pstmt.setString(4, em.getMail());
-			 pstmt.setString(5, em.getMotdepasse());
+			 pstmt.setString(1,em.getId());
+			 pstmt.setString(2,em.getNom());
+			 pstmt.setString(3,em.getPernom());
+			 pstmt.setString(4,em.getMail());
+			 pstmt.setString(5,em.getMotdepasse());
 			 pstmt.executeUpdate();	 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -95,10 +96,19 @@ public class Employe_controller {
 		}  
 	}
 	
-
-	public void Delete_Compte(String id){
+	public void Desactivate_Employe(String id){
 		 try {
-			 pstmt = con.prepareStatement("DELETE FROM compte where id = ? ");
+			 pstmt = con.prepareStatement("UPDATE employe SET emp_etat = 0 WHERE e_id = ?");
+			 pstmt.setString(1,id);
+			 pstmt.execute();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	public void Delete_Employe(String id){
+		 try {
+			 pstmt = con.prepareStatement("DELETE FROM employe where e_id = ? ");
 			 pstmt.setString(1,id);
 			 pstmt.execute();
 		} catch (SQLException e) {
