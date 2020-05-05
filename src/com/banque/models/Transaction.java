@@ -57,6 +57,15 @@ public class Transaction {
 		this.responsable = responsable;
 	}
 
+	public Transaction(String type, Compte tran,int montant, Employe responsable,String created_at) {
+		super();
+		this.type = type;
+		this.emetteur = tran;
+		this.montant = montant;
+		this.responsable = responsable;
+		this.date_transaction = created_at;
+	}
+	
 	public int getId() {
 		return id;
 	}
