@@ -1004,7 +1004,7 @@ public class BanqueApplication {
         			DefaultTableModel updateTableEmp = (DefaultTableModel) employee_table.getModel();
         			employee_table.setModel(updateTableEmp);
         			updateTableEmp.addRow(new Object[]{employeNv.getId(),employeNv.getNom(),employeNv.getPernom(), employeNv.getMail()});						
-        			EmployeArray.add(employeNv);
+        			EmployeArray.add(employeNv);		
         			resetEmployeForm();
 					JOptionPane.showMessageDialog(null, "Employe ajouter ! " );		
         		}
@@ -1196,13 +1196,9 @@ public class BanqueApplication {
 		}
 		for(int i = 0 ; i < data.size(); i++ ) {
 			ArrayList<Object> ob = data.get(i);
-			for(int j = 0 ; j < ob.size(); j++) {
-				System.out.println(" j : "+j+" -- "+ob.get(j));
-			}
 			tableEmployeTransaction.addRow(new Object[]{ob.get(0),ob.get(1),ob.get(2),ob.get(3),ob.get(4)});						
 		}
 	}
-
 	public void loadTitulairComboBox() {
 		CCli = new Client_controller();
 		CCli.Connexion();
@@ -1263,6 +1259,8 @@ public class BanqueApplication {
         header.add("COMPTE");
         header.add("SOLDE");
         header.add("DATE DE CREATION" );
+        
+        
         Vector<Vector<Object>> data = new  Vector<Vector<Object>>();
 		for (int i = 0; i < list.size(); i++){
            Vector<Object> row = new Vector<Object>();
@@ -1278,7 +1276,8 @@ public class BanqueApplication {
            row.add(creation);
            data.add(row);
         }		
-        panel_compte.setLayout(null);	
+        
+		panel_compte.setLayout(null);	
         jTable = new JTable(data,header);
         jTable.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 	}
@@ -1309,15 +1308,16 @@ public class BanqueApplication {
         panel_Client.setLayout(null);	
         table_3 = new JTable(data,header);
         table_3.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-
 	}
+	
+	
+	
 	public void LoadTransaction() {
 		tc =  new Transaction_controller();
 		tc.Connexion();
     	TransactionArray = new ArrayList<Transaction>();
     	TransactionArray = tc.Get_transactions();
         Vector<String> header = new Vector<String>();
-        
         header.add("EMETTERUR");
         header.add("COMPTE");
         header.add("TYPE");
@@ -1327,7 +1327,6 @@ public class BanqueApplication {
         header.add("Responsable");
         header.add("DATE");
         Vector<Vector<Object>> data = new  Vector<Vector<Object>>();
-
     	TransactionArray = tc.Get_transactions();
 		for (int i = 0; i < TransactionArray.size(); i++){
             Vector<Object> row = new Vector<Object>();
@@ -1351,7 +1350,6 @@ public class BanqueApplication {
             row.add(montant); 
             row.add(Responsable);
             row.add(date);
-
             data.add(row);
         }
         panel_transaction.setLayout(null);	
